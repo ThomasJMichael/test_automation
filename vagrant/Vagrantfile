@@ -41,15 +41,17 @@ Vagrant.configure("2") do |config|
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
-  config.vm.synced_folder "./shared", "/vagrant_shared", type: "rsync",
-   rsync__exclude: ".git/"
-
-  config.vm.synced_folder "../scripts", "/vagrant_shared/scripts", type: "rsync",
-   rsync__exclude: ".git/"
-
-  config.vm.synced_folder "../docker", "/vagrant_shared/docker", type: "rsync",
-   rsync__exclude: ".git/"
-
+  folders_to_sync = [
+    ["./shared", "/vagrant_shared"],
+    ["../scripts", "/vagrant_shared/scripts"],
+    ["../docker", "/vagrant_shared/docker"],
+    ["../docker/cobbler/volumes", "/vagrant_shared/docker/volumes"]
+  ]
+  
+  folders_to_sync.each do |src, dest|
+    config.vm.synced_folder src, dest, type: "rsync", rsync__exclude: ".git/"
+  end
+  
   # Disable the default share of the current code directory. Doing this
   # provides improved isolation between the vagrant box and your host
   # by making sure your Vagrantfile isn't accessable to the vagrant box.

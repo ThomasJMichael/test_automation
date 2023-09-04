@@ -4,7 +4,7 @@
 CONTAINER_NAME="cobbler_container"
 
 # Check if the container is running
-if docker ps | awk -v container="$CONTAINER_NAME" 'NR>1{print $NF}' | grep -q "^$container$"; then
+if docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
     echo "Accessing the container: $CONTAINER_NAME"
     docker exec -it $CONTAINER_NAME /bin/bash
 else

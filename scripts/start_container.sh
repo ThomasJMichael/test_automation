@@ -5,6 +5,9 @@ IMAGE_NAME="cobbler_image"
 CONTAINER_NAME="cobbler_container"
 BUILD_PATH="../docker"
 
+# cleanup docker resources
+docker system prune -f
+
 # Check if the container already exists
 if docker ps -a --format '{{.Names}}' | grep -Eq "^${CONTAINER_NAME}\$"; then
     echo "Container ${CONTAINER_NAME} already exists."
@@ -40,14 +43,15 @@ else
     docker run -d \
         --name ${CONTAINER_NAME} \
         --privileged \
+        --net host \
         --tmpfs /run \
         --tmpfs /run/lock \
         -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
-        -p 67:67 \
-        -p 69:69 \
-        -p 873:873 \
-        -p 80:80 \
-        -p 25151:25151 \
+        -v /vagrant_share/docker/cobbler/volumes/var/www/cobbler:/var/www/cobbler \
+        -v /vagrant_share/docker/cobbler/volumes/var/lib/cobbler/config:/var/lib/cobbler \
+        -v /vagrant_share/docker/cobbler/volumes/var/lib/tftpboot:/var/lib/tftpboot \
+        -v /vagrant_share/docker/cobbler/volumes/var/config:/var/config \
+        -v /vagrant_share/docker/cobbler/volumes/storage/baseimgs:/storage/baseimgs \
         $IMAGE_NAME
 
     # Check if the container started successfully
