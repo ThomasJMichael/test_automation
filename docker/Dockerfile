@@ -1,8 +1,10 @@
 # Use an official Rocky Linux image as a parent image
-FROM rockylinux/rockylinux:9
+FROM rockylinux/rockylinux:8
 
-# Set environment variables to non-interactive (this prevents some prompts)
-ENV container docker
+ENV COBBLER_RPM cobbler-3.3.3-1.el8.noarch.rpm
+
+# Copy the RPM from the cobbler directory into the container
+COPY cobbler/$COBBLER_RPM /$COBBLER_RPM
 
 # Install systemd and its libraries
 RUN dnf -y install systemd systemd-libs && dnf clean all
@@ -19,19 +21,27 @@ RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == system
     && rm -f /lib/systemd/system/systemd*udev* \
     && systemctl mask dev-hugepages.mount sys-fs-fuse-connections.mount
 
-# Install EPEL repository for extra packages
-RUN dnf install -y epel-release
+VOLUME [ "/sys/fs/cgroup"]
 
-# Install the additional packages
-RUN dnf install -y dhcp-server pykickstart yum-utils debmirror git rsync-daemon \
-    ipxe-bootimgs shim grub2-efi-x64-modules && \
-    dnf clean all
+# RUN rpm -e cobbler --nodeps
+RUN set -ex \
+  && dnf install -y epel-release \
+  && dnf install -y /$COBBLER_RPM \
+  && rpm -e cobbler --nodeps \
+  && dnf install -y dhcp-server pykickstart yum-utils debmirror git rsync-daemon \
+          ipxe-bootimgs shim grub2-efi-x64-modules \
+  # Fix the permission of shim-x64
+  && chmod a+r -R /boot/efi/EFI \
+  && dnf clean all \
+  # fix debian repo support
+  && sed -i "s/^@dists=/# @dists=/g" /etc/debmirror.conf \
+  && sed -i "s/^@arches=/# @arches=/g" /etc/debmirror.conf \
+  # enable services
+  && systemctl enable httpd dhcpd tftp rsyncd
 
-# Copy the RPM from the cobbler directory into the container
-COPY cobbler/cobbler-3.3.3-1.el9.noarch.rpm /tmp/
+# enable the services
+RUN systemctl enable httpd dhcpd tftp rsyncd
 
-# Install Cobbler from the local RPM
-RUN dnf install -y /tmp/cobbler-3.3.3-1.el9.noarch.rpm
 
 # If you have other files or directories in the cobbler directory to add, use COPY or ADD commands
 # For example:
@@ -54,11 +64,8 @@ EXPOSE 80
 # Cobbler's XML-RPC API
 EXPOSE 25151
 
-# Add any custom configuration files
-ADD ./cobbler/settings /etc/cobbler/settings
-
 # Copy the entrypoint script into the container
 COPY entrypoint.sh /entrypoint.sh
 
 # Set the entrypoint
-ENTRYPOINT ["/entrypoint.sh"]
+CMD ["/entrypoint.sh"]
