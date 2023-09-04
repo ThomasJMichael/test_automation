@@ -28,7 +28,7 @@ Vagrant.configure("2") do |config|
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
   # config.vm.network "private_network", ip: "192.168.33.10"
-  config.vm.network "private_network", ip: "192.168.75.1"
+  config.vm.network "", ip: "192.168.75.1"
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
@@ -45,7 +45,8 @@ Vagrant.configure("2") do |config|
     ["./shared", "/vagrant_shared"],
     ["../scripts", "/vagrant_shared/scripts"],
     ["../docker", "/vagrant_shared/docker"],
-    ["../docker/cobbler/volumes", "/vagrant_shared/docker/volumes"]
+    ["../docker/cobbler/volumes", "/vagrant_shared/docker/volumes"],
+    ["../squid", "/vagrant_shared/squid"]
   ]
   
   folders_to_sync.each do |src, dest|
