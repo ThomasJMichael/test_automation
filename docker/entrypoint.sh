@@ -13,5 +13,5 @@ systemctl restart tftp.service
 
 tail -n +1 -f /var/log/cobbler/cobbler.log
 
-) &
+) & 
 exec /usr/sbin/init

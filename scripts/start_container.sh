@@ -47,11 +47,11 @@ else
         --tmpfs /run \
         --tmpfs /run/lock \
         -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
-        -v /vagrant_share/docker/cobbler/volumes/var/www/cobbler:/var/www/cobbler \
-        -v /vagrant_share/docker/cobbler/volumes/var/lib/cobbler/config:/var/lib/cobbler \
-        -v /vagrant_share/docker/cobbler/volumes/var/lib/tftpboot:/var/lib/tftpboot \
-        -v /vagrant_share/docker/cobbler/volumes/var/config:/var/config \
-        -v /vagrant_share/docker/cobbler/volumes/storage/baseimgs:/storage/baseimgs \
+        -v /vagrant_shared/docker/cobbler/volumes/var/www/cobbler:/var/www/cobbler \
+        -v /vagrant_shared/docker/cobbler/volumes/var/lib/cobbler/config:/var/lib/cobbler \
+        -v /vagrant_shared/docker/cobbler/volumes/var/lib/tftpboot:/var/lib/tftpboot \
+        -v /vagrant_shared/docker/cobbler/volumes/var/config:/var/config \
+        -v /vagrant_shared/docker/cobbler/volumes/storage/baseimgs:/storage/baseimgs \
         $IMAGE_NAME
 
     # Check if the container started successfully
