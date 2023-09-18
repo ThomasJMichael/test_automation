@@ -1,26 +1,42 @@
 #!/bin/bash
 
-# Function to update package list and upgrade all packages
 update_packages() {
     echo "Updating package list and upgrading all packages..."
     sudo apt-get update
     sudo apt-get upgrade -y
 }
 
-# Function to install basic dependencies
 install_basic_dependencies() {
     echo "Installing basic dependencies..."
     sudo apt-get install -y software-properties-common
 }
 
-# Function to install Ansible
+install_dev_tools() {
+    echo "Installing development tools..."
+    sudo apt-get install -y make tar git wget bzip2 zip gcc build-essential python3-dev libffi-dev
+}
+
+install_network_tools() {
+    echo "Installing network utilities..."
+    sudo apt-get install -y net-tools dmidecode jq
+}
+
+install_auth_tools() {
+    echo "Installing authentication tools..."
+    sudo apt-get install -y sssd-ldap sssd-krb5 realmd ldap-utils libnl-genl-3-200
+}
+
+install_misc_tools() {
+    echo "Installing miscellaneous tools..."
+    sudo apt-get install -y perl
+}
+
 install_ansible() {
     echo "Installing Ansible..."
     sudo apt-add-repository --yes --update ppa:ansible/ansible
     sudo apt-get install -y ansible
 }
 
-# Function to install Docker
 install_docker() {
     echo "Installing Docker..."
     sudo apt-get update
@@ -31,14 +47,21 @@ install_docker() {
     sudo apt-get install -y docker-ce
 }
 
-# Function to install Squid
 install_squid() {
     echo "Installing Squid..."
     sudo apt-get install -y squid
+    
+    echo "Enabling Squid..."
+    sudo systemctl enable --now squid
 }
 
-# Function to configure Firewall and SELinux
+# Function to configure Firewall and Apparmor
 configure_security() {
+    echo "Disabling apprmor..."
+
+    sudo systemctl stop apparmor
+    sudo systemctl disable apparmor
+
     echo "Configuring Firewall..."
 
     # Allow SSH, HTTP, HTTPS, and Squid ports
@@ -57,6 +80,9 @@ configure_security() {
 main() {
     update_packages
     install_basic_dependencies
+    install_dev_tools
+    install_network_tools
+    install_auth_tools
     install_ansible
     install_docker
     install_squid

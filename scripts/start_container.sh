@@ -30,7 +30,15 @@ if docker ps -a --format '{{.Names}}' | grep -Eq "^${CONTAINER_NAME}\$"; then
 else
     # Build the Docker image
     echo "Building Docker image: $IMAGE_NAME..."
-    docker build -t $IMAGE_NAME $BUILD_PATH
+    MAX_RETRIES=10
+    RETRY_DELAY=1
+    RETRY_COUNT=0
+    while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+        docker build -t $IMAGE_NAME $BUILD_PATH && break
+        RETRY_COUNT=$((RETRY_COUNT+1))
+        echo "Build failed, retrying in $RETRY_DELAY seconds..."
+        sleep $RETRY_DELAY
+    done
 
     # Check if the build was successful
     if [ $? -ne 0 ]; then
