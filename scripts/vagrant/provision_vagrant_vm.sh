@@ -66,6 +66,9 @@ configure_security() {
 
     # Allow SSH, HTTP, HTTPS, and Squid ports
     sudo ufw allow 22/tcp    # SSH
+    sudo ufw allow 67/udp    # DHCP
+    sudo ufw allow 68/udp    # DHCP
+    sudo ufw allow 69/udp    # TFTP
     sudo ufw allow 80/tcp    # HTTP
     sudo ufw allow 443/tcp   # HTTPS
     sudo ufw allow 3128/tcp  # Squid default port
@@ -86,8 +89,7 @@ main() {
     install_ansible
     install_docker
     install_squid
-    configure_security  # Replacing disable_security with configure_security
+    configure_security 
 }
 
-# Run the main function
 main
