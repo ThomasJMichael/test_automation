@@ -2,7 +2,7 @@
 
 DHCP_TEMPLATE="/vagrant_shared/docker/cobbler/volumes/var/lib/cobbler/config/dhcp.template"
 SETTINGS_YAML="/vagrant_shared/docker/cobbler/volumes/var/lib/cobbler/config/settings.yaml"
-JSON_FILE="/vagrant_share/docker/cobbler/cobbler_config.json"
+JSON_FILE="/vagrant_share/config/host.json"
 
 if [ ! -f $DHCP_TEMPLATE ] || [ ! -f $SETTINGS_YAML ] || [ ! -f $JSON_FILE ]; then
     echo "Configuration files not found!"
