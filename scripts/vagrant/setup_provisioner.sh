@@ -1,7 +1,7 @@
 #!/bin/bash
 
-PROVISIONER_DIR = "/vagrant_shared/provisioner-v3"
-HOST_JSON = "/vagrant_shared/config/host.json"
+PROVISIONER_DIR="/vagrant_shared/provisioner-v3"
+HOST_JSON="/vagrant_shared/config/host.json"
 
 if [ ! -f $HOST_JSON ]; then
     echo "host.json file not found at $HOST_JSON. Exiting."
@@ -20,17 +20,37 @@ if [ $? -ne 0 ]; then
 fi
 
 install_provisioner(){
-    sudo python3 $PROVISIONER_DIR/setup.py install
+    cd $PROVISIONER_DIR
+    sudo python3 setup.py install
     
-    if [ $? -ne 0]; then
+    if [ $? -ne 0 ]; then
         echo "Error installing provisioner tools. Exiting." 
         exit 1
     fi
+
+    cd -
 }
 
-config_dhcp_tftp(){
-    # Copy files from provisioner library to appropriate location
-    cp $PROVISIONER_DIR/ubuntupxe/unicode.pf2 /srv/tftp/boot/fonts/
+install_tftp_dhcp(){
+    sudo apt install -y isc-dhcp-server apache2 tftpd-hpa grub-efi-amd64-bin
+}
+
+setup_tftp_for_pxe(){
+    mkdir -p /srv/tftp
+    chmod -R 777 /srv/tftp
+    chown -R nobody /srv/tftp
+
+    mkdir -p /srv/tftp/boot/grub
+    mkdir -p /srv/tftp/boot/fonts
+
+    cd /srv/tftp && ln -s boot/grub grub
+
+    sudo grub-mknetdir --net-directory /srv/tftp/
+    curl -O http://archive.ubuntu.com/ubuntu/dists/jammy/main/uefi/grub2-amd64/current/grubnetx64.efi.signed
+    cp grubnetx64.efi.signed /srv/tftp/boot/bootx64.efi
+}
+
+copy_and_config_tftp_dhcp(){
     cp $PROVISIONER_DIR/ubuntupxe/grub.cfg.template /srv/tftp/boot/grub/
     cp $PROVISIONER_DIR/misc/grub.cfg.uattemplate /srv/tftp/boot/grub/
     cp $PROVISIONER_DIR/ubuntupxe/grub.cfg /srv/tftp/boot/grub/
@@ -48,7 +68,6 @@ setup_provisioner_scripts(){
     # Currently copying scripts from provisiner but I want to
     # redo the implementaton of the scripts in the future
     # and move the scripts to a /scripts/provisoner/ directory
-
     sudo cp $PROVISIONER_DIR/ubuntupxe/*.sh /vagrant_shared/scripts
     sudo cp $PROVISIONER_DIR/misc/*.sh /vagrant_shared/scripts
 
@@ -57,12 +76,14 @@ setup_provisioner_scripts(){
 }
 
 stop_tftp_dhcp_service(){
-    /vagrant_shared/ubuntu_pxe_stop.sh
+    /vagrant_shared/scripts/ubuntu_pxe_stop.sh
 }
 
 main(){
     install_provisioner
-    config_dhcp_tftp
+    install_tftp_dhcp
+    setup_tftp_for_pxe
+    copy_and_config_tftp_dhcp
     setup_provisioner_scripts
     stop_tftp_dhcp_service
 }

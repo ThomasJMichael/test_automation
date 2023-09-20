@@ -17,7 +17,6 @@ Vagrant.configure("2") do |config|
     ["../scripts", "/vagrant_shared/scripts"],
     ["../docker", "/vagrant_shared/docker"],
     ["../docker/cobbler/volumes", "/vagrant_shared/docker/volumes"],
-    ["../squid", "/vagrant_shared/squid"],
     ["../provisioner-v3", "/vagrant_shared/provisioner-v3"]
   ]
   
@@ -30,4 +29,8 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.provision "shell", path: "../scripts/vagrant/provision_vagrant_vm.sh"
+  config.vm.provision :reload
+  config.vm.provision "shell", path: "../scripts/vagrant/setup_provisioner.sh"
+  config.vm.provision "shell", path: "../scripts/vagrant/setup_squid.sh"
+  config.vm.provision "shell", path: "../scripts/vagrant/set_netplan.sh"
 end
