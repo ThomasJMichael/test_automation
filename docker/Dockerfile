@@ -64,8 +64,10 @@ EXPOSE 80
 # Cobbler's XML-RPC API
 EXPOSE 25151
 
-# Copy the entrypoint script into the container
 COPY entrypoint.sh /entrypoint.sh
+COPY configure_docker_container.sh /configure_docker_container.sh
+COPY host.json /host.json
+
 
 # Set the entrypoint
 CMD ["/entrypoint.sh"]

@@ -1,1 +1,3 @@
 vagrant/.vagrant/
+
+docker/cobbler/volumes/storage/baseimgs

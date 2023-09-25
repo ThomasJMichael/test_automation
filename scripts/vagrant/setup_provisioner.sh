@@ -8,6 +8,8 @@ if [ ! -f $HOST_JSON ]; then
     exit 1
 fi
 
+sudo apt-get install -y jq
+
 RANGE=$(jq -r ".dhcp_range" $HOST_JSON)
 SERVER=$(jq -r ".dhcp_server" $HOST_JSON)
 SUBNET=$(jq -r ".dhcp_subnet" $HOST_JSON)
@@ -20,15 +22,7 @@ if [ $? -ne 0 ]; then
 fi
 
 install_provisioner(){
-    cd $PROVISIONER_DIR
     sudo python3 setup.py install
-    
-    if [ $? -ne 0 ]; then
-        echo "Error installing provisioner tools. Exiting." 
-        exit 1
-    fi
-
-    cd -
 }
 
 install_tftp_dhcp(){
@@ -36,9 +30,9 @@ install_tftp_dhcp(){
 }
 
 setup_tftp_for_pxe(){
-    mkdir -p /srv/tftp
-    chmod -R 777 /srv/tftp
-    chown -R nobody /srv/tftp
+    sudo mkdir -p /srv/tftp
+    sudo chmod -R 777 /srv/tftp
+    sudo chown -R nobody /srv/tftp
 
     mkdir -p /srv/tftp/boot/grub
     mkdir -p /srv/tftp/boot/fonts
@@ -76,16 +70,24 @@ setup_provisioner_scripts(){
 }
 
 stop_tftp_dhcp_service(){
-    /vagrant_shared/scripts/ubuntu_pxe_stop.sh
+    if [[ -x "/vagrant_shared/scripts/ubuntu_pxe_stop.sh" ]]; then
+        sed -i 's/\r$//' /vagrant_shared/scripts/ubuntu_pxe_stop.sh
+        /vagrant_shared/scripts/ubuntu_pxe_stop.sh
+    else
+        echo "Error: ubuntu_pxe_stop.sh not found or not executable."
+        exit 1
+    fi
 }
 
 main(){
+    echo "Running setup_provisioner.sh..."
     install_provisioner
     install_tftp_dhcp
     setup_tftp_for_pxe
     copy_and_config_tftp_dhcp
     setup_provisioner_scripts
     stop_tftp_dhcp_service
+    echo "setup_provisioner.sh finshed."
 }
 
 main

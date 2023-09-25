@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SQUID_CONF="/etc/squid/squid.conf
+SQUID_CONF="/etc/squid/squid.conf"
 
 check_squid_conf(){
     if [ ! -f $SQUID_CONF ]; then
@@ -41,9 +41,11 @@ restart_squid(){
 }
 
 main(){
+    echo "Running setup_squid.sh...."
     check_squid_conf
     configure_squid
     restart_squid
+    echo "setup_squid.sh finished."
 }
 
 main

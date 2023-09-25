@@ -3,7 +3,7 @@
 # Define the image and container names
 IMAGE_NAME="cobbler_image"
 CONTAINER_NAME="cobbler_container"
-BUILD_PATH="../docker"
+BUILD_PATH="/vagrant_shared/docker"
 
 # cleanup docker resources
 docker system prune -f
@@ -28,6 +28,22 @@ if docker ps -a --format '{{.Names}}' | grep -Eq "^${CONTAINER_NAME}\$"; then
         exit 0
     fi
 else
+    HOST_JSON_SRC="/vagrant_shared/config/host.json"
+    CONFIGURE_SCRIPT_SRC="/vagrant_shared/scripts/docker/configure_docker_container.sh"
+
+    HOST_JSON_DEST="$BUILD_PATH/host.json"
+    CONFIGURE_SCRIPT_DEST="$BUILD_PATH/configure_docker_container.sh"
+    
+    if [ ! -f "$HOST_JSON_DEST" ]; then
+        echo "Copying host.json to Docker build directory..."
+        cp "$HOST_JSON_SRC" "$HOST_JSON_DEST"
+    fi
+
+    if [ ! -f "$CONFIGURE_SCRIPT_DEST" ]; then
+        echo "Copying configure_docker_container.sh to Docker build directory..."
+        cp "$CONFIGURE_SCRIPT_SRC" "$CONFIGURE_SCRIPT_DEST"
+    fi
+
     # Build the Docker image
     echo "Building Docker image: $IMAGE_NAME..."
     MAX_RETRIES=10

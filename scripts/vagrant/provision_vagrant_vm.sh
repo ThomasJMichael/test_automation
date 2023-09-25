@@ -3,7 +3,7 @@
 update_packages() {
     echo "Updating package list and upgrading all packages..."
     sudo apt-get update
-    sudo apt-get upgrade -y
+    # sudo apt-get upgrade -y
 }
 
 install_basic_dependencies() {
@@ -28,7 +28,7 @@ install_auth_tools() {
 
 install_misc_tools() {
     echo "Installing miscellaneous tools..."
-    sudo apt-get install -y perl
+    sudo apt-get install -y perl 
 }
 
 install_ansible() {
@@ -64,7 +64,7 @@ configure_security() {
 
     echo "Configuring Firewall..."
 
-    sudo ufw allow 22/tcp    # SSH
+    # sudo ufw allow 22/tcp    # SSH (Enabled by default for Vagrant)
     sudo ufw allow 67/udp    # DHCP
     sudo ufw allow 68/udp    # DHCP
     sudo ufw allow 69/udp    # TFTP
@@ -80,6 +80,7 @@ configure_security() {
 
 # Main execution
 main() {
+    echo "Running provision_vagrant_vm.sh..."
     update_packages
     install_basic_dependencies
     install_dev_tools
@@ -89,6 +90,7 @@ main() {
     install_docker
     install_squid
     configure_security 
+    echo "provision_vagrant_vm.sh finished."
 }
 
 main

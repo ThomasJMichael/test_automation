@@ -4,8 +4,10 @@
 # when requesting an ip address and makes outbound traffic prioritize
 # a ceratin ethernet interface
 
+echo "Setting up netplan..."
+
 NETPLAN_CONF="/etc/netplan/50-vagrant.yaml"
-ETH_INTERFACE="eth2" # Cobbler Network Interface
+ETH_INTERFACE="eth1"
 
 # Check if the Netplan configuration file exists
 if [ ! -f "$NETPLAN_CONF" ]; then
@@ -30,7 +32,7 @@ else
 fi
 
 # Check the route metric
-ROUTE_METRIC=$(ip route | grep "$ETH_INTERFACE" | awk '{print $9}')
+ROUTE_METRIC=$(ip route | grep "^default.*$ETH_INTERFACE" | awk '{print $NF}')
 if [ "$ROUTE_METRIC" == "90" ]; then
     echo "Route metric for $ETH_INTERFACE is set to 90 as expected."
 else

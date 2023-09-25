@@ -33,4 +33,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", path: "../scripts/vagrant/setup_provisioner.sh"
   config.vm.provision "shell", path: "../scripts/vagrant/setup_squid.sh"
   config.vm.provision "shell", path: "../scripts/vagrant/set_netplan.sh"
+  
+  config.vm.provision "shell", path: "../scripts/docker/start_container.sh"
+  config.vm.provision "shell", path: "../scripts/docker/restart_container.sh"
 end

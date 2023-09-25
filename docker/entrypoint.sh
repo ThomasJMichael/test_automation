@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 dnf install -y /cobbler-3.3.3-1.el8.noarch.rpm
+
+./configure_docker_container.sh
+
 (
 sleep 10
 # Start cobblerd
