@@ -1,0 +1,266 @@
+{ 
+    "debian" : { 
+        "ubuntu1804"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/ubuntu1804.iso",
+            "kickstart"     : "config/cobbler/debian.ks",
+            "profile_name"  : "ubuntu1804"
+        },
+        "ubuntu2004"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/ubuntu2004.iso",
+            "kickstart"     : "config/cobbler/debian.ks",
+            "profile_name"  : "ubuntu2004"
+        },
+        "ubuntu2204"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/ubuntu2204.iso",
+            "kickstart"     : "config/cobbler/debian.ks",
+            "profile_name"  : "ubuntu2204"
+        }
+    },
+    "rhel" : {
+        "fedora30"   : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/fedora30.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "fedora30"
+        },
+        "fedora31"   : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/fedora31.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "fedora31"
+        },
+        "fedora32"   : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/fedora32.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "fedora32"
+        },
+        "fedora33"   : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/fedora33.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "fedora33"
+        },
+        "fedora34"   : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/fedora34.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "fedora34"
+        },
+        "fedora35"   : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/fedora35.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "fedora35"
+        },
+        "fedora36"   : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/fedora36.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "fedora36"
+        },
+        "fedora37"   : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/fedora37.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "fedora37"
+        },
+        "fedora38"   : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/fedora38.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "fedora38"
+        },
+        "centos77"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/centos77.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "centos77"
+        },
+
+        "centos78"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/centos78.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "centos78"
+        },
+        "centos79"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/centos79.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "centos79"
+        },
+        "centos81"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/centos81.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "centos81"
+        },
+        "centos82"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/centos82.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "centos82"
+        },
+        "centos83"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/centos83.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "centos83"
+        },
+        "rhel77"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/rhel77.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "rhel77"
+        },
+        "rhel78"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/rhel78.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "rhel78"
+        },
+        "rhel79"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/rhel79.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "rhel79"
+        },
+        "rhel82"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/rhel82.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "rhel82"
+        },
+        "rhel83"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/rhel83.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "rhel83"
+        },
+        "rhel84"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/rhel84.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "rhel84"
+        },
+        "rhel85"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/rhel85.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "rhel85"
+        },
+        "rhel86"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/rhel86.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "rhel86"
+        },
+        "rhel87"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/rhel87.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "rhel87"
+        },
+        "rhel88"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/rhel88.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "rhel88"
+        },
+        "rhel90"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/rhel90.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "rhel90"
+        },
+        "rhel91"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/rhel91.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "rhel91"
+        },
+        "rhel92"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/rhel92.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "rhel92"
+        },
+        "rocky87"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/rocky87.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "rocky87"
+        },
+        "rocky88"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/rocky88.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "rocky88"
+        },
+        "rocky91"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/rocky91.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "rocky91"
+        },
+        "rocky92"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/rocky92.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "rocky92"
+        },
+        "alma92"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/alma92.iso",
+            "kickstart"     : "config/cobbler/default.ks",
+            "profile_name"  : "alma92"
+        },
+        "redhawk91"  : {
+            "os_type"       : "linux",
+            "url"           : "",
+            "path"          : "/storage/baseimgs/redhawk91.iso",
+            "kickstart"     : "config/cobbler/redhawk.ks",
+            "profile_name"  : "redhawk91"
+        } 		 		
+    }
+}

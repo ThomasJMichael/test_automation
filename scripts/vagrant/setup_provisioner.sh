@@ -22,7 +22,16 @@ if [ $? -ne 0 ]; then
 fi
 
 install_provisioner(){
+    cd $PROVISIONER_DIR
+
+    sudo apt install -y python3-pip
+
+    # Install the specific dependencies for provisioner tool
+    pip3 install asn1crypto==0.24.0 bcrypt==3.1.7 certifi==2019.9.11 PyNaCl==1.3.0 cffi==1.12.3
+
     sudo python3 setup.py install
+
+    cd -
 }
 
 install_tftp_dhcp(){

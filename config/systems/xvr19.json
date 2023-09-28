@@ -1,0 +1,41 @@
+{
+    "system_name" : "xvr19uut",
+    "test_target" : "system",
+    "netdev" : "eno1",
+    "ub_netdev" : "eno1",
+    "mac_address" : "00:20:38:09:d5:0f",
+    "ip_address" : "192.168.75.151",
+    "port" : 22,
+    "conn_type" : "ssh",
+    "gateway" : "192.168.75.1",
+    "os" : "os.json",
+    "kopts": "console=ttyS0,115200,8,n,1",
+    "installdev": "/dev/sda",
+    "local_filepaths" : {
+        "sshconfig" : "config/ssh_proxy"
+    },
+    "ansible_file" : "ansible/sbc3511.yml",
+    "ansible_vars" : {
+        "proxy" : {
+            "proto" : "http://",
+            "host" : "192.168.75.1",
+            "port" : "3128"
+        },
+		"sdk" : "https://towart01.ametek.com/artifactory/SW/SDK/x86_64/linux/stable/SLIO-X86_64-05UC.iso",
+		"cibit" : "https://towart01.ametek.com/artifactory/SW/CIBIT/x86_64/linux/stable/PLIA-X86_64-T1UC.iso",
+		"cibit_ut" : "https://towart01.ametek.com/artifactory/SW/CIBIT/x86_64/linux/stable/cibit-linux-1.0_plus_unittests.tgz",
+		"pbitres" : "https://towart01.ametek.com/artifactory/SW/PBITRES/x86_64/linux/stable/PLIA-X86_64-R4E3UC.iso",
+		"fpga10g" : "https://towart01.ametek.com/artifactory/SW/10GETH/x86_64/linux/stable/DLIN-10GETH-01UC.iso"
+    },
+    "iboot" : {
+        "ip_address" : "192.168.75.85",
+        "user" : "admin",
+        "password": "admin"
+    },
+    "dev_username" : "npi",
+    "dev_password" : "password",
+    "uat_name" : "sbc3511",
+    "uat_netdev" : "eno1",
+    "uat_address" : "00:80:8E:08:A6:6D",
+    "uat_ip_address" : "192.168.0.151"
+}

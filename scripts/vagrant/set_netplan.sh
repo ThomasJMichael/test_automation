@@ -7,7 +7,7 @@
 echo "Setting up netplan..."
 
 NETPLAN_CONF="/etc/netplan/50-vagrant.yaml"
-ETH_INTERFACE="eth1"
+ETH_INTERFACE="enp0s8"
 
 # Check if the Netplan configuration file exists
 if [ ! -f "$NETPLAN_CONF" ]; then

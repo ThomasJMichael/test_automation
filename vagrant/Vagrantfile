@@ -5,7 +5,7 @@ cobbler_network = "ASIX AX88179 USB 3.0 to Gigabit Ethernet Adapter"
 main_network = "Intel(R) Ethernet Connection (10) I219-V"
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "generic/ubuntu2204"
+  config.vm.box = "ubuntu/focal64"
   config.vm.network "forwarded_port", guest: 22, host: 2222, id: "ssh", auto_correct: true
 
   config.vm.network "public_network", bridge: main_network

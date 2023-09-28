@@ -16,7 +16,7 @@ configure_squid(){
     sudo sed -i 's/^acl localnet/\#acl localnet/g' $SQUID_CONF
 
     # Add custom ACLs for SSL ports, Safe ports, and localnet
-    sudo sed -i '/^acl SSL_ports.*/a acl SSL_ports port 22\nacl Safe_ports port 22\nacl localnet src 192.168.0.0\/24' $SQUID_CONF
+    sudo sed -i '/^acl SSL_ports.*/a acl SSL_ports port 22\nacl Safe_ports port 22\nacl localnet src 192.168.75.0\/24' $SQUID_CONF
 
     # Allow traffic from localnet and then deny all other traffic
     sudo sed -i 's/^http_access deny all/http_access allow localnet\nhttp_access deny all/g' $SQUID_CONF

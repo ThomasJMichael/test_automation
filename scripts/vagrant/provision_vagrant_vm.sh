@@ -59,12 +59,15 @@ install_squid() {
 configure_security() {
     echo "Disabling apprmor..."
 
+    sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.dhcpd # Kernel apparmor module
+    # sudo aa-complain /usr/sbin/dhcpd
+
     sudo systemctl stop apparmor
     sudo systemctl disable apparmor
 
     echo "Configuring Firewall..."
 
-    # sudo ufw allow 22/tcp    # SSH (Enabled by default for Vagrant)
+    sudo ufw allow 22/tcp    # SSH (Enabled by default for Vagrant)
     sudo ufw allow 67/udp    # DHCP
     sudo ufw allow 68/udp    # DHCP
     sudo ufw allow 69/udp    # TFTP
