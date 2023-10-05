@@ -1,0 +1,32 @@
+---
+- name: Execute cobbler setup role
+  include_role:
+    name: cobbler-setup
+
+- name: "Log cobblerTool output for {{ item }}"
+  delegate_to: localhost
+  copy:
+    content: "{{ cobbler_output.stdout }}"
+    dest: "{{ logging.results_directory }}/{{ test_name }}/cobbler_{{ ansible_date_time.iso8601_basic_short }}.log"
+
+- name: Execute reboot system role
+  include_role:
+    name: reboot-system
+
+- name: Execute setup proxy role
+  include_role:
+    name: setup-proxy
+
+- name: Install Dependencies on Target Machine
+  include_role:
+    name: install-dependencies
+
+- name: Execute SSH and ping test role
+  include_role:
+    name: ssh_ping_test
+
+- name: "Log ping output for {{ item }}"
+  delegate_to: localhost
+  copy:
+    content: "{{ ping_output.stdout }}"
+    dest: "{{ logging.results_directory }}/{{ playbook_name }}/ping_{{ ansible_date_time.iso8602_basic_short }}.log"

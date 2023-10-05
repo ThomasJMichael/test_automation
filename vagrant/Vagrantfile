@@ -12,10 +12,10 @@ Vagrant.configure("2") do |config|
   config.vm.network "public_network", bridge: cobbler_network, ip: "192.168.75.1"
 
   folders_to_sync = [
-    ["./shared", "/vagrant_shared"],
+    ["../ansible", "/vagrant_shared/ansible"],
     ["../config", "/vagrant_shared/config"],
     ["../scripts", "/vagrant_shared/scripts"],
-    ["../docker", "/vagrant_shared/docker"],
+    #["../docker", "/vagrant_shared/docker"],
     ["../docker/cobbler/volumes", "/vagrant_shared/docker/volumes"],
     ["../provisioner-v3", "/vagrant_shared/provisioner-v3"]
   ]

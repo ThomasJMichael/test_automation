@@ -1,0 +1,61 @@
+---
+- name: "Setup Playbook and Read pconfig"
+  hosts: localhost
+  gather_facts: no
+  vars:
+    board:
+      name: "xvr19"
+    pconfig_path: "../../config/systems/{{ board.name }}.json"
+  vars_files:
+    - "{{ pconfig_path }}"
+  tasks:
+  - name: Set required variables for roles
+    set_fact:
+      target_ip: "{{ ip_address }}"
+      pconfig_path: "{{ pconfig_path }}"
+      test_name: "ping_test"
+    delegate_facts: true
+
+  - name: Debug pconfig_vars
+    debug:
+      var: ip_address
+
+  - name: Add target IP to inventory
+    add_host:
+      name: "{{ target_ip }}"
+      groups: dynamic_hosts
+      ansible_ssh_user: "{{ dev_username }}"
+      ansible_ssh_pass: "{{ dev_password }}"
+
+- name: "Ping Test Playbook"
+  hosts: dynamic_hosts
+  gather_facts: yes
+  vars:
+    test_name: "{{ hostvars['localhost']['test_name'] }}"
+    pconfig : "{{ hostvars['localhost']['pconfig_path'] }}"
+    target_ip: "{{ hostvars['localhost']['target_ip'] }}"
+    required_os:
+      - fedora36
+      - ubuntu2004
+    requires_slave_board: false
+    steps:
+      - "Step 1: Set up and ping on each required OS"
+    dependencies:
+      packages:
+        # List down the packages required for the test
+    cleanup:
+      # Cleanup steps, if any
+    logging:
+      results_directory: "../../logs"
+      log_file: "ping_test.log"
+  tasks:
+  - name: "Ensure logging directory exists"
+    delegate_to: localhost
+    file:
+      path: "{{ logging.results_directory }}"
+      state: directory
+      mode: '0755'
+
+  - name: "Execute tasks for each OS"
+    include_tasks: os-tasks.yaml
+    with_items: "{{ required_os }}"

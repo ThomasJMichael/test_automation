@@ -1,0 +1,24 @@
+---
+- name: Ensure target_ip is defined
+  fail:
+    msg: "The variable 'target_ip' is not defined. Please provide the target IP address."
+  when: target_ip is not defined
+
+- name: Ensure the current host matches target_ip
+  fail:
+    msg: "The current host ({{ inventory_hostname }}) does not match the specified target_ip ({{ target_ip }}). Please ensure you're running the playbook on the correct host."
+  when: inventory_hostname != target_ip
+
+- name: Gather facts from target machine
+  setup:
+  delegate_to: "{{ target_ip }}"
+
+- name: Install dependencies based on OS distribution
+  include_tasks: "{{ ansible_distribution }}.yaml"
+  when: ansible_distribution in supported_distributions
+
+# To support a new distribution:
+# 1. Add the distribution name to the supported_distributions list above.
+# 2. Create a new task file named after the distribution (e.g., ubuntu.yaml) in the tasks directory.
+# 3. Define any distribution-specific tasks in that file.
+# 4. If needed, add distribution-specific variables in the vars directory.

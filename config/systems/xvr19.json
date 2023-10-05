@@ -4,7 +4,7 @@
     "netdev" : "eno1",
     "ub_netdev" : "eno1",
     "mac_address" : "00:20:38:09:d5:0f",
-    "ip_address" : "192.168.75.151",
+    "ip_address" : "192.168.75.152",
     "port" : 22,
     "conn_type" : "ssh",
     "gateway" : "192.168.75.1",
