@@ -1,6 +1,6 @@
-yum_generic_packages:
+generic_packages:
   - python3
-  - "kernel-devel-{{ kernel_version.stdout }}"
+  - "kernel-devel-{{ ansible_kernel }}"
   - curl
   - wget
   - tar

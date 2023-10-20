@@ -16,7 +16,6 @@ Vagrant.configure("2") do |config|
     ["../config", "/vagrant_shared/config"],
     ["../scripts", "/vagrant_shared/scripts"],
     #["../docker", "/vagrant_shared/docker"],
-    ["../docker/cobbler/volumes", "/vagrant_shared/docker/volumes"],
     ["../provisioner-v3", "/vagrant_shared/provisioner-v3"]
   ]
   
@@ -33,7 +32,10 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", path: "../scripts/vagrant/setup_provisioner.sh"
   config.vm.provision "shell", path: "../scripts/vagrant/setup_squid.sh"
   config.vm.provision "shell", path: "../scripts/vagrant/set_netplan.sh"
+  config.vm.provision "shell", path: "../scripts/vagrant/update_ssh_config.sh", privileged: false
+
+  config.vm.provision "shell", path: "../provisioner-v3/ubuntupxe/ubuntu_pxe_stop.sh", run: 'always'
   
-  config.vm.provision "shell", path: "../scripts/docker/start_container.sh"
-  config.vm.provision "shell", path: "../scripts/docker/restart_container.sh"
+  config.vm.provision "shell", path: "../scripts/docker/start_container.sh", run: 'always'
+  config.vm.provision "shell", path: "../scripts/docker/restart_container.sh", run: 'always'
 end

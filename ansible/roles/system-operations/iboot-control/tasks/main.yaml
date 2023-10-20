@@ -1,0 +1,16 @@
+---
+- name: Turn iBoot On
+  iboot-on:
+    ip: "{{ iboot_ip }}"
+    user: "{{ iboot_user }}"
+    password: "{{ iboot_password }}"
+  delegate_to: localhost
+  when: iboot_action == 'on'
+
+- name: Turn iBoot Off
+  iboot-off:
+    ip: "{{ iboot_ip }}"
+    user: "{{ iboot_user }}"
+    password: "{{ iboot_password }}"
+  delegate_to: localhost
+  when: iboot_action == 'off'

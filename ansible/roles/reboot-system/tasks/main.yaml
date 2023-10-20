@@ -1,6 +1,0 @@
----
-- name: Reboot the system
-  become: true
-  reboot:
-    reboot_timeout: 300
-

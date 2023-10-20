@@ -1,0 +1,21 @@
+---
+- name: "Setup Cobbler profile using cobblerTool inside Vagrant VM"
+  become: true
+  become_method: sudo
+  command:
+    cmd: "cobblerTool {{ current_os }} --repo_dir /vagrant_shared/config/systems --pconfig {{ pconfig }} --force --debug"
+  register: cobbler_output
+  delegate_to: localhost
+
+- debug:
+    msg: "Running cobblerToolWrapper.sh with parameters: {{ current_os }}, --repo_dir /vagrant_shared/config/systems, --pconfig {{ pconfig }}, --force, --debug"
+  when: debug_mode | default(false)
+  delegate_to: localhost
+
+- debug:
+    msg: "Output from cobblerToolWrapper.sh: {{ cobbler_output.stdout }}"
+    verbosity: 2
+  when: debug_mode | default(false)
+  delegate_to: localhost
+
+# "/vagrant_shared/ansible/utils/cobblerToolWrapper.sh {{ item }} --repo_dir /vagrant_shared/config/systems --pconfig {{ pconfig }} --force --debug"

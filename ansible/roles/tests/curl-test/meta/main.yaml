@@ -1,0 +1,10 @@
+---
+test_name: "sample_test"
+description: "Description of the test"
+required_os:
+  - rocky92
+  - fedora36
+logging:
+  results_directory: "/vagrant_shared/logs"
+  log_file: "sample_test.log"
+requires_slave_board: false

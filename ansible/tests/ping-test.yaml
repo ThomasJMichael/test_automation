@@ -29,28 +29,35 @@
 
 - name: "Ping Test Playbook"
   hosts: dynamic_hosts
-  gather_facts: yes
+  gather_facts: no
   vars:
     test_name: "{{ hostvars['localhost']['test_name'] }}"
     pconfig : "{{ hostvars['localhost']['pconfig_path'] }}"
     target_ip: "{{ hostvars['localhost']['target_ip'] }}"
+    debug_mode: true
     required_os:
+      - rocky92
       - fedora36
-      - ubuntu2004
     requires_slave_board: false
     steps:
-      - "Step 1: Set up and ping on each required OS"
+      - "Step 1: Set up and curl on each required OS"
     dependencies:
       packages:
         # List down the packages required for the test
     cleanup:
       # Cleanup steps, if any
     logging:
-      results_directory: "../../logs"
+      results_directory: "/vagrant_shared/logs"
       log_file: "ping_test.log"
   tasks:
+  - name: Set ansible_date_time variable
+    delegate_to: localhost
+    set_fact:
+      current_time: "{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}"
+
   - name: "Ensure logging directory exists"
     delegate_to: localhost
+    become: true
     file:
       path: "{{ logging.results_directory }}"
       state: directory

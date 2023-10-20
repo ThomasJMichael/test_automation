@@ -13,9 +13,16 @@
   setup:
   delegate_to: "{{ target_ip }}"
 
-- name: Install dependencies based on OS distribution
-  include_tasks: "{{ ansible_distribution }}.yaml"
-  when: ansible_distribution in supported_distributions
+- set_fact:
+    debug_mode: true
+    supported_distributions:
+      - fedora
+
+- block:
+    - name: Install dependencies based on OS distribution
+      include_tasks: "{{ ansible_distribution | lower }}.yaml"
+      when: ansible_distribution | lower in supported_distributions | map('lower') | list
+  become: false
 
 # To support a new distribution:
 # 1. Add the distribution name to the supported_distributions list above.

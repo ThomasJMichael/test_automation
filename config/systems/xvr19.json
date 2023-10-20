@@ -1,10 +1,11 @@
 {
     "system_name" : "xvr19uut",
     "test_target" : "system",
+    "tests": ["curl-test"],
     "netdev" : "eno1",
     "ub_netdev" : "eno1",
     "mac_address" : "00:20:38:09:d5:0f",
-    "ip_address" : "192.168.75.152",
+    "ip_address" : "192.168.75.201",
     "port" : 22,
     "conn_type" : "ssh",
     "gateway" : "192.168.75.1",
@@ -27,8 +28,12 @@
 		"pbitres" : "https://towart01.ametek.com/artifactory/SW/PBITRES/x86_64/linux/stable/PLIA-X86_64-R4E3UC.iso",
 		"fpga10g" : "https://towart01.ametek.com/artifactory/SW/10GETH/x86_64/linux/stable/DLIN-10GETH-01UC.iso"
     },
+    "ksmeta": {
+        "ip_address_enp_cobbler": "eno1",
+        "dev_interface": "eno1"
+    },
     "iboot" : {
-        "ip_address" : "192.168.75.85",
+        "ip_address" : "192.168.75.153",
         "user" : "admin",
         "password": "admin"
     },

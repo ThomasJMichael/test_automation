@@ -1,0 +1,40 @@
+---
+- name: Load pconfig JSON file
+  ansible.builtin.include_vars:
+    file: "{{ pconfig }}"
+    name: pconfig_vars
+
+- debug:
+    msg: "Loaded pconfig_vars: {{ pconfig_vars }}"
+  when: debug_mode | default(false)
+
+- name: Power off the device using iBoot
+  include_role:
+    name: iboot-control
+  vars:
+    iboot_action: 'off'
+    iboot_ip: "{{ pconfig_vars.iboot.ip_address }}"
+    iboot_user: "{{ pconfig_vars.iboot.user }}"
+    iboot_password: "{{ pconfig_vars.iboot.password }}"
+
+- name: Wait for 10 seconds
+  pause:
+    seconds: 10
+
+- name: Power on the device using iBoot
+  include_role:
+    name: iboot-control
+  vars:
+    iboot_action: 'on'
+    iboot_ip: "{{ pconfig_vars.iboot.ip_address }}"
+    iboot_user: "{{ pconfig_vars.iboot.user }}"
+    iboot_password: "{{ pconfig_vars.iboot.password }}"
+
+- name: Wait for the device to come back online
+  wait_for:
+    host: "{{ target_ip }}"
+    port: 22
+    state: started
+    delay: 10
+    timeout: 1200 # (20 minutes) Needs to be long enough to handle the automated install
+  delegate_to: localhost

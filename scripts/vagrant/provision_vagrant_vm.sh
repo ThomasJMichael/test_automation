@@ -13,7 +13,7 @@ install_basic_dependencies() {
 
 install_dev_tools() {
     echo "Installing development tools..."
-    sudo apt-get install -y make tar git wget bzip2 zip gcc build-essential python3-dev libffi-dev
+    sudo apt-get install -y make tar git wget bzip2 zip gcc build-essential python3-dev libffi-dev expect
 }
 
 install_network_tools() {
@@ -59,15 +59,15 @@ install_squid() {
 configure_security() {
     echo "Disabling apprmor..."
 
-    sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.dhcpd # Kernel apparmor module
-    # sudo aa-complain /usr/sbin/dhcpd
-
     sudo systemctl stop apparmor
     sudo systemctl disable apparmor
 
+    sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.dhcpd # Kernel apparmor module
+    # sudo aa-complain /usr/sbin/dhcpd
+
     echo "Configuring Firewall..."
 
-    sudo ufw allow 22/tcp    # SSH (Enabled by default for Vagrant)
+    sudo ufw allow 22/tcp    # SSH 
     sudo ufw allow 67/udp    # DHCP
     sudo ufw allow 68/udp    # DHCP
     sudo ufw allow 69/udp    # TFTP

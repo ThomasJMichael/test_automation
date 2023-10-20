@@ -1,0 +1,43 @@
+---
+- name: Ensure efibootmgr is installed
+  package:
+    name: efibootmgr
+    state: present
+  become: true
+  register: result
+  until: result is succeeded
+  retries: 5
+  delay: 10
+
+- name: Get current boot entries
+  command: efibootmgr
+  register: boot_order
+  changed_when: false
+  ignore_errors: true
+
+- debug:
+    var: boot_order.stdout_lines
+  when: debug_mode
+
+- name: Extract PXE boot options
+  set_fact:
+    pxe_boot_entries: "{{ boot_order.stdout_lines | select('search', 'PXE IP4 Intel\\(R\\)') | map('regex_replace', '^Boot(\\w{4}).*', '\\1') | list }}"
+  when: boot_order is defined and boot_order.stdout_lines is defined
+
+- debug:
+    var: pxe_boot_entries
+  when: debug_mode
+
+- debug:
+    msg: "Values of PXE boot entries: {{ pxe_boot_entries | join(', ') }}"
+  when: pxe_boot_entries | length > 0
+
+- name: Set new boot order with PXE entries first
+  command: "efibootmgr -o {{ pxe_boot_entries | join(',') }}"
+  become: true
+  when: pxe_boot_entries | length > 0
+
+- debug:
+    msg: "Setting boot order to PXE entries: {{ pxe_boot_entries | join(',') }}"
+  when: pxe_boot_entries | length > 0
+

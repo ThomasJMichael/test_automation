@@ -1,13 +1,37 @@
----
+- name: Get and analyze current boot order
+  command: efibootmgr
+  register: current_boot_order
+  changed_when: false
+  check_mode: no
+
+- name: Conditionally execute setup proxy role
+  include_role:
+    name: setup-proxy
+  when: "('PXE' not in current_boot_order.stdout_lines[0])"
+
+- name: Conditionally adjust boot order for PXE
+  include_role:
+    name: manage-efi-boot
+  when: "('PXE' not in current_boot_order.stdout_lines[0])"
+
 - name: Execute cobbler setup role
   include_role:
     name: cobbler-setup
 
+- name: Ensure logging directory exists
+  delegate_to: localhost
+  become: true
+  file:
+    path: "{{ logging.results_directory }}/{{ test_name }}"
+    state: directory
+    mode: '0755'
+
 - name: "Log cobblerTool output for {{ item }}"
   delegate_to: localhost
+  become: true
   copy:
     content: "{{ cobbler_output.stdout }}"
-    dest: "{{ logging.results_directory }}/{{ test_name }}/cobbler_{{ ansible_date_time.iso8601_basic_short }}.log"
+    dest: "{{ logging.results_directory }}/{{ test_name }}/cobbler_{{ current_time }}.log"
 
 - name: Execute reboot system role
   include_role:
@@ -17,16 +41,27 @@
   include_role:
     name: setup-proxy
 
+- name: Modify EFI boot order
+  include_role:
+    name: manage-efi-boot
+
 - name: Install Dependencies on Target Machine
   include_role:
     name: install-dependencies
 
-- name: Execute SSH and ping test role
-  include_role:
-    name: ssh_ping_test
+- name: SSH and execute curl test
+  command: curl -I http://www.google.com
+  register: curl_output
+  ignore_errors: true
 
-- name: "Log ping output for {{ item }}"
+- name: Display curl results
+  debug:
+    var: curl_output.stdout_lines
+
+- name: "Log curl output for {{ item }}"
   delegate_to: localhost
+  become: true
   copy:
-    content: "{{ ping_output.stdout }}"
-    dest: "{{ logging.results_directory }}/{{ playbook_name }}/ping_{{ ansible_date_time.iso8602_basic_short }}.log"
+    content: "{{ curl_output.stdout }}"
+    dest: "{{ logging.results_directory }}/{{ test_name }}/curl_{{ current_time }}.log"
+

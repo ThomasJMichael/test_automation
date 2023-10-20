@@ -1,0 +1,12 @@
+---
+- name: Execute Test
+  include_role:
+    name: "{{ current_test.name }}"
+  register: test_output
+
+- name: Log results for the test
+  delegate_to: localhost
+  become: true
+  copy:
+    content: "{{ test_output.stdout }}"
+    dest: "{{ current_test.logging.results_directory }}/{{ current_test.name }}_{{ current_time }}{{ current_test.logging.log_format }}"

@@ -1,0 +1,39 @@
+---
+- name: Get and analyze current boot order
+  command: efibootmgr
+  register: current_boot_order
+  changed_when: false
+  check_mode: no
+
+- name: Setup Proxy Role if necessary
+  include_role:
+    name: setup-proxy
+  when: "('PXE' not in current_boot_order.stdout_lines[0])"
+
+- name: Conditionally adjust boot order for PXE
+  include_role:
+    name: manage-efi-boot
+  when: "('PXE' not in current_boot_order.stdout_lines[0])"
+
+- name: Execute cobbler setup role
+  include_role:
+    name: cobbler-setup
+
+- name: Execute reboot system role
+  include_role:
+    name: reboot-system
+
+- name: Execute setup Proxy Role 
+  include_role:
+    name: setup-proxy
+
+- name: Install Dependencies on Target Machine
+  include_role:
+    name: install-dependencies
+
+- include_tasks: execute-test.yaml
+  loop: "{{ test_metadata }}"
+  loop_control:
+    loop_var: current_test
+
+

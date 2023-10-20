@@ -1,0 +1,12 @@
+---
+- name: Extract all operating systems from test metadata
+  set_fact:
+    required_os: "{{ required_os + test.metadata.required_os }}"
+  loop: "{{ test_metadata }}"
+  loop_control:
+    loop_var: test
+  when: test.metadata.required_os is defined
+
+- name: Make the required_os list unique
+  set_fact:
+    required_os: "{{ required_os | unique }}"
