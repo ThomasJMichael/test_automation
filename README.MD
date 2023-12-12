@@ -60,13 +60,3 @@ test_automation
 4. Use the scripts provided in the `scripts` directory to automate various tasks.
 
 ---
-%post --log=/root/efibootmgr_post.log
-# Adjust boot order using efibootmgr
-# Get boot numbers for PXE entries
-PXE1=$(efibootmgr | grep "PXE IP4 Intel(R) I210 Gigabit  Network Connection" | head -1 | cut -d' ' -f1 | sed 's/Boot//;s/*//')
-PXE2=$(efibootmgr | grep "PXE IP4 Intel(R) I210 Gigabit  Network Connection" | tail -1 | cut -d' ' -f1 | sed 's/Boot//;s/*//')
-# Get the boot number for the primary OS entry (BootCurrent)
-CURRENT_OS=$(efibootmgr | grep "^BootCurrent" | cut -d' ' -f2)
-# Set the boot order
-efibootmgr -o $PXE1,$PXE2,$CURRENT_OS
-%end
