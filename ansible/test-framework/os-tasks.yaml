@@ -1,0 +1,82 @@
+---
+- name: Print current OS
+  debug: 
+      msg: "Currently targeting {{ current_os }}"
+
+- name: Setup Proxy Role
+  include_role:
+    name: system-operations/setup-proxy
+
+- name: Check if efibootmgr is installed
+  command: which efibootmgr
+  register: efibootmgr_installed
+  failed_when: efibootmgr_installed.rc not in [0,1]
+  changed_when: false
+
+- name: Install efibootmgr if it's not present
+  package:
+    name: efibootmgr
+    state: present
+  when: efibootmgr_installed.rc != 0
+  become: true
+
+- name: Get and analyze current boot order
+  command: efibootmgr
+  register: current_boot_order
+  changed_when: false
+  check_mode: no
+
+- name: Conditionally adjust boot order for PXE
+  include_role:
+    name: system-operations/manage-efi-boot
+  when: "('PXE' not in current_boot_order.stdout_lines[0])"
+
+- name: Execute cobbler setup role
+  include_role:
+    name: system-operations/cobbler-setup
+  vars:
+    target_os: "{{ current_os }}"
+    config_json: "{{ board_config.uut.name }}.json"
+
+- include_role:
+    name: system-operations/reboot-system
+  vars:
+    iboot_ip: "{{ board_config.iboot.ip_address }}"
+    iboot_user: "{{ board_config.iboot.username }}"
+    iboot_password: "{{ board_config.iboot.password }}"
+    device_ip_address: "{{ board_config.uut.ip_address }}"
+
+- name: Set Python interpreter to auto
+  set_fact:
+    ansible_python_interpreter: auto
+
+- name: Set date to Ansible Controller's date
+  include_role:
+    name: system-operations/set-date
+  vars:
+    date: "{{ hostvars['localhost']['controller_date']['stdout'] }}"
+
+- name: Execute setup Proxy Role 
+  include_role:
+    name: system-operations/setup-proxy
+
+- name: Install Dependencies on Target Machine
+  include_role:
+    name: system-operations/install-dependencies
+
+- name: Gather OS facts
+  setup:
+    # This will gather only the subset of facts related to distribution and version
+    gather_subset:
+      - '!all'
+      - '!any'
+      - '!min'
+      - 'distribution'
+      - 'hardware'
+  register: os_facts
+
+- name: Execute Tests
+  include_tasks: execute-tests.yaml
+  loop: "{{ board_config.tests }}"
+  loop_control:
+    loop_var: current_test

@@ -1,0 +1,38 @@
+---
+name: xvr19
+
+tests:
+  - curl-test
+  - vme-test
+
+iboot:
+  ip_address: 192.168.75.153
+  username: admin
+  password: admin
+
+uut:
+  name: xvr19uut
+  target: system
+  network_device: eno1
+  mac_address: 00:20:38:09:d5:0f
+  ip_address: 192.168.75.201
+  gateway: 192.168.75.1
+  os_file: os.json
+  kernel_options: console=ttyS0,115200,8,n,1
+  installation_device: /dev/sda
+  username: npi
+  password: password
+
+uat:
+  name: xvr19uat
+  target: system
+  os: rocky92
+  network_device: eno1
+  mac_address: 00:20:78:79:60:02
+  ip_address: 192.168.75.150
+  gateway: 192.168.75.1
+  os_file: os.json
+  kernel_options: console=ttyS0,115200,8,n,1
+  installation_device: /dev/sda
+  username: npi
+  password: password

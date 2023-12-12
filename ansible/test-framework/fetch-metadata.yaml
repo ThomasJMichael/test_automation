@@ -1,0 +1,10 @@
+---
+- name: Include the meta/main.yaml for the current test
+  include_vars:
+    file: "/vagrant_shared/ansible/roles/tests/{{ current_test }}/vars/main.yaml"
+    name: current_test_metadata
+    
+- name: Append the metadata to the test_metadata list
+  set_fact:
+    test_metadata: "{{ test_metadata + [{ 'test_name': current_test, 'metadata': current_test_metadata }] }}"
+

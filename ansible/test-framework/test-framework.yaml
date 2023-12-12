@@ -1,0 +1,96 @@
+---
+- name: "Test Framework Playbook Initialization"
+  hosts: localhost
+  gather_facts: false
+  vars:
+    board_name: "xvr19"
+    log_path: "/vagrant_shared/logs/{{ board_name }}"
+    log_filename: "{{ board_name }}_{{ lookup('pipe', 'date +%Y%m%d%H%M%S ')}}"
+    required_os: []
+    test_metadata: []
+
+  tasks:
+    - name: Set log path and log filename facts
+      set_fact:
+        log_path: "/vagrant_shared/logs/{{ board_name }}"
+        log_filename: "{{ board_name }}_{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}"
+    
+    - name: Ensure log directory exists
+      file:
+        path: "{{ log_path }}"
+        state: directory
+        mode: '0755'
+      become: yes
+
+    - name: Get Ansible Controller's date
+      command: date '+%Y%m%d %H:%M:%S'
+      register: controller_date
+
+    - name: Load YAML data into variables
+      include_vars:
+        file: "/vagrant_shared/ansible/config/{{ board_name }}.yaml"
+        name: board_config
+
+    - name: Generate UUT JSON configuration
+      include_role:
+        name: system-operations/generate-config-json
+      vars:
+        unit_config: "{{ board_config.uut }}"
+        destination: "/vagrant_shared/config/systems/{{ board_config.uut.name }}.json"
+
+    - name: Generate UAT JSON configuration
+      include_role:
+        name: system-operations/generate-config-json
+      vars:
+        unit_config: "{{ board_config.uat }}"
+        destination: "/vagrant_shared/config/systems/{{ board_config.uat.name }}.json"
+      when: board_config.uat is defined
+
+    - name: Fetch metadata for each test
+      include_tasks: fetch-metadata.yaml
+      loop: "{{ board_config.tests }}"
+      loop_control:
+        loop_var: current_test
+
+    - name: Retrieve the Operating Systems required for testing
+      include_tasks: fetch-os-required.yaml
+
+    - name: Add UUT IP to dynamic inventory
+      add_host:
+        name: "{{ board_config.uut.ip_address }}"
+        groups: uut_board
+        ansible_ssh_user: "{{ board_config.uut.username }}"
+        ansible_ssh_pass: "{{ board_config.uut.password }}"
+
+    - name: Check if UAT is defined and add to inventory
+      add_host:
+        name: "{{ board_config.uat.ip_address }}"
+        groups: uat_board
+        ansible_ssh_user: "{{ board_config.uat.username }}"
+        ansible_ssh_pass: "{{ board_config.uat.password }}"
+      when: board_config.uat is defined
+
+- name: "Setup UAT Board if Defined"
+  hosts: uat_board
+  gather_facts: false
+  vars: 
+    board_config: "{{ hostvars['localhost']['board_config'] }}"
+  tasks:
+    - name: Setup UAT/Slave Board
+      include_role:
+        name: system-operations/setup-uat
+
+- name: "Execute Tasks and Tests on UUT Board"
+  hosts: uut_board
+  gather_facts: false
+  vars: 
+    required_os: "{{ hostvars['localhost']['required_os'] }}"
+    board_config: "{{ hostvars['localhost']['board_config'] }}"
+    debug_mode: true
+
+  tasks:
+    - name: Execute OS-tasks for each required OS
+      include_tasks: os-tasks.yaml
+      loop: "{{ required_os | unique }}"
+      loop_control:
+        loop_var: current_os

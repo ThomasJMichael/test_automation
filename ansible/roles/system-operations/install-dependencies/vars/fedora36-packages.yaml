@@ -1,0 +1,2 @@
+specific_distribution_packages:
+  - ncurses-compat-libs

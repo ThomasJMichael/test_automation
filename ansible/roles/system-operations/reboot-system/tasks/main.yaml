@@ -1,40 +1,46 @@
 ---
-- name: Load pconfig JSON file
-  ansible.builtin.include_vars:
-    file: "{{ pconfig }}"
-    name: pconfig_vars
-
-- debug:
-    msg: "Loaded pconfig_vars: {{ pconfig_vars }}"
-  when: debug_mode | default(false)
+- name: Assert required variables are defined
+  assert:
+    that:
+      - iboot_ip is defined
+      - iboot_user is defined
+      - iboot_password is defined
+      - device_ip_address is defined
+    fail_msg: "Required variable(s) are not defined"
 
 - name: Power off the device using iBoot
   include_role:
-    name: iboot-control
+    name: system-operations/iboot-control
   vars:
-    iboot_action: 'off'
-    iboot_ip: "{{ pconfig_vars.iboot.ip_address }}"
-    iboot_user: "{{ pconfig_vars.iboot.user }}"
-    iboot_password: "{{ pconfig_vars.iboot.password }}"
+    ib_action: 'off'
+    ib_ip: "{{ iboot_ip }}"
+    ib_user: "{{ iboot_user }}"
+    ib_password: "{{ iboot_password }}"
 
-- name: Wait for 10 seconds
+- name: Wait for a defined interval
   pause:
-    seconds: 10
+    seconds: "{{ power_cycle_pause | default(10) }}"
 
 - name: Power on the device using iBoot
   include_role:
-    name: iboot-control
+    name: system-operations/iboot-control
   vars:
-    iboot_action: 'on'
-    iboot_ip: "{{ pconfig_vars.iboot.ip_address }}"
-    iboot_user: "{{ pconfig_vars.iboot.user }}"
-    iboot_password: "{{ pconfig_vars.iboot.password }}"
+    ib_action: 'on'
+    ib_ip: "{{ iboot_ip }}"
+    ib_user: "{{ iboot_user }}"
+    ib_password: "{{ iboot_password }}"
 
 - name: Wait for the device to come back online
   wait_for:
-    host: "{{ target_ip }}"
-    port: 22
+    host: "{{ device_ip_address }}"
+    port: "{{ ssh_port | default(22) }}"
     state: started
-    delay: 10
-    timeout: 1200 # (20 minutes) Needs to be long enough to handle the automated install
+    delay: "{{ ssh_delay | default(10) }}"
+    timeout: "{{ ssh_timeout | default(1200) }}"
   delegate_to: localhost
+  register: result
+
+- name: Handle timeout error
+  fail:
+    msg: "The device did not come back online within the specified timeout period."
+  when: result.failed

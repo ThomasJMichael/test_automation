@@ -1,0 +1,13 @@
+---
+test_name: "vme-test"
+description: "Setups, runs, and tests the capivme driver"
+uat_required: true
+required_os:
+  - rocky92
+  - fedora36
+
+# Variables for repo-clone role
+repo_clone_vars:
+  repo_url: 'http://{{ githubuser | urlencode }}:{{ githubpassword | urlencode }}@10.175.4.11/software/driver/linux-capi-vme.git'
+  dest_path: '/home/npi/vme-test-repo'
+  repo_branch: 'master'  # Optional: specify if you need a specific branch

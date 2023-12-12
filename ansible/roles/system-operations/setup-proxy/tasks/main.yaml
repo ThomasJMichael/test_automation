@@ -3,11 +3,6 @@
   setup:
   when: ansible_os_family is undefined
 
-- name: Load pconfig variables
-  include_vars:
-    file: "{{ pconfig }}"
-    name: "pconfig_vars"
-
 - name: Ensure [main] section exists in dnf.conf
   when: ansible_os_family == "RedHat"
   lineinfile:
@@ -22,7 +17,7 @@
   lineinfile:
     path: /etc/dnf/dnf.conf
     regexp: '^proxy='
-    line: "proxy={{ pconfig_vars.ansible_vars.proxy.proto }}{{ pconfig_vars.ansible_vars.proxy.host }}:{{ pconfig_vars.ansible_vars.proxy.port }}"
+    line: "proxy={{ proxy_proto }}://{{ proxy_host }}:{{ proxy_port }}"
     create: true
   become: true
 
@@ -30,22 +25,36 @@
   when: ansible_os_family == "Debian"
   copy:
     content: |
-      Acquire::http::Proxy "{{ pconfig_vars.ansible_vars.proxy.proto }}{{ pconfig_vars.ansible_vars.proxy.host }}:{{ pconfig_vars.ansible_vars.proxy.port }}";
+      Acquire::http::Proxy "{{ proxy_proto }}://{{ proxy_host }}:{{ proxy_port }}";
     dest: /etc/apt/apt.conf.d/90proxy
   become: true
 
 - name: Set up proxy for bash environment
   lineinfile:
     path: /etc/environment
-    regexp: '^{{ item }}_PROXY='
-    line: "{{ item }}_PROXY={{ pconfig_vars.ansible_vars.proxy.proto }}{{ pconfig_vars.ansible_vars.proxy.host }}:{{ pconfig_vars.ansible_vars.proxy.port }}"
+    regexp: '^{{ item }}_proxy='
+    line: "{{ item }}_proxy={{ proxy_proto }}://{{ proxy_host }}:{{ proxy_port }}"
     state: present
   loop:
-    - HTTP
-    - HTTPS
+    - http
+    - https
   become: true
 
 - name: Apply the proxy settings immediately
+  shell: source /etc/environment
+  become: true
+- name: Apply the proxy settings immediately
   shell: |
-    export HTTP_PROXY="{{ pconfig_vars.ansible_vars.proxy.proto }}{{ pconfig_vars.ansible_vars.proxy.host }}:{{ pconfig_vars.ansible_vars.proxy.port }}"
-    export HTTPS_PROXY="{{ pconfig_vars.ansible_vars.proxy.proto }}{{ pconfig_vars.ansible_vars.proxy.host }}:{{ pconfig_vars.ansible_vars.proxy.port }}"
+    export HTTP_PROXY="{{ proxy_proto }}://{{ proxy_host }}:{{ proxy_port }}"
+    export HTTPS_PROXY="{{ proxy_proto }}://{{ proxy_host }}:{{ proxy_port }}"
+
+- name: Test the proxy setup
+  command: curl -I http://www.google.com
+  register: test_result
+  ignore_errors: true
+  when: debug_mode | default (false)
+
+- name: Display proxy test result
+  debug:
+    msg: "{{ test_result }}"
+  when: debug_mode | default (false)

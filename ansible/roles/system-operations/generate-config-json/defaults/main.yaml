@@ -1,0 +1,1 @@
+dest_path: "/vagrant_shared/config/systems/{{ unit_config.name }}.json"

@@ -1,0 +1,6 @@
+---
+test_name: "curl-test"
+description: "Description of the test"
+required_os:
+  - rocky92
+  - fedora36

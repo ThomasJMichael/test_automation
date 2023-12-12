@@ -1,14 +1,4 @@
 ---
-- name: Ensure efibootmgr is installed
-  package:
-    name: efibootmgr
-    state: present
-  become: true
-  register: result
-  until: result is succeeded
-  retries: 5
-  delay: 10
-
 - name: Get current boot entries
   command: efibootmgr
   register: boot_order
@@ -17,7 +7,7 @@
 
 - debug:
     var: boot_order.stdout_lines
-  when: debug_mode
+  when: debug_mode | default (false)
 
 - name: Extract PXE boot options
   set_fact:
@@ -26,11 +16,11 @@
 
 - debug:
     var: pxe_boot_entries
-  when: debug_mode
+  when: debug_mode | default (false)
 
 - debug:
     msg: "Values of PXE boot entries: {{ pxe_boot_entries | join(', ') }}"
-  when: pxe_boot_entries | length > 0
+  when: debug_mode | default (false)
 
 - name: Set new boot order with PXE entries first
   command: "efibootmgr -o {{ pxe_boot_entries | join(',') }}"

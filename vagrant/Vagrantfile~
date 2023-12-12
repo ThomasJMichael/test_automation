@@ -15,7 +15,7 @@ Vagrant.configure("2") do |config|
     ["../ansible", "/vagrant_shared/ansible"],
     ["../config", "/vagrant_shared/config"],
     ["../scripts", "/vagrant_shared/scripts"],
-    ["../docker", "/vagrant_shared/docker"],
+    #["../docker", "/vagrant_shared/docker"],
     ["../provisioner-v3", "/vagrant_shared/provisioner-v3"]
   ]
   

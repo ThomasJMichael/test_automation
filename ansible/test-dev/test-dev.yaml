@@ -1,0 +1,67 @@
+---
+# Used for developing new test roles.
+# This will run the test role without provisioning the board.
+# To Run: ansible-playbook test-dev.yml -e "board_name=myboard" -e "test_name=my_test_role"
+- name: "Test Framework Playbook for Test Role Development"
+  hosts: localhost
+  gather_facts: false
+  vars:
+    board_name: "{{ board_name | default('xvr19') }}"
+    test_name: "{{ test_name | default('default_test') }}"
+    log_path: "/vagrant_shared/logs/{{ board_name }}"
+    log_filename: "{{ board_name }}_{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}"
+    board_config: {}
+
+  tasks:
+    - name: Load Board Configurations
+      include_vars:
+        file: "/vagrant_shared/ansible/config/{{ board_name }}.yaml"
+        name: board_config
+
+    - name: Add UUT IP to dynamic inventory
+      add_host:
+        name: "{{ board_config.uut.ip_address }}"
+        groups: uut_board
+        ansible_ssh_user: "{{ board_config.uut.username }}"
+        ansible_ssh_pass: "{{ board_config.uut.password }}"
+
+    - name: Check if UAT is defined and add to inventory
+      add_host:
+        name: "{{ board_config.uat.ip_address }}"
+        groups: uat_board
+        ansible_ssh_user: "{{ board_config.uat.username }}"
+        ansible_ssh_pass: "{{ board_config.uat.password }}"
+      when: board_config.uat is defined
+      
+- name: "Run Specific Test on UUT Board"
+  hosts: uut_board
+  gather_facts: false
+  vars:
+    board_config: "{{ hostvars['localhost']['board_config'] }}"
+
+  tasks:
+    - name: Set Python interpreter to auto
+      set_fact:
+        ansible_python_interpreter: auto
+
+    - name: Load test vars
+      include_vars:
+        file: "/vagrant_shared/ansible/roles/tests/{{ test_name }}/vars/main.yaml"
+      register: test_vars
+
+    - name: Setup Proxy
+      include_role:
+        name: "system-operations/setup-proxy"
+      
+    - name: Run test on UAT to set state if required
+      include_role:
+        name: "tests/{{ test_name }}"
+        apply:
+          delegate_to: "{{ board_config.uat.ip_address }}"
+          when: uat_required
+
+    - name: Run Specified Test Role
+      include_role:
+        name: "tests/{{ test_name }}"
+      vars:
+        debug_mode: true

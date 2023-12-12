@@ -1,4 +1,4 @@
-family_packges:
+family_packages:
   - python3
   - "kernel-devel-{{ ansible_kernel }}"
   - curl

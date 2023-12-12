@@ -1,0 +1,10 @@
+---
+- name: Load required OS for current test
+  include_vars:
+    file: "tests/{{ current_test }}/vars/main.yml"
+  register: test_vars
+
+- name: Include Test Role
+  include_role:
+    name: tests/{{ current_test }}
+  when: current_os in test_vars.required_os

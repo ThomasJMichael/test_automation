@@ -1,0 +1,13 @@
+---
+- name: Ensure destination directory exists
+  local_action:
+    module: file
+    path: "{{ dest_path | dirname }}"
+    state: directory
+
+- name: Generate JSON configuration for unit
+  local_action:
+    module: template
+    src: config.json.j2
+    dest: "{{ dest_path }}"
+

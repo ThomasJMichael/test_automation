@@ -1,0 +1,37 @@
+---
+# Tasks for repo-clone role
+# This role clones a specified Git repository to a given destination path.
+# It requires 'repo_url' and 'dest_path' variables and optionally uses 'repo_branch'.
+- name: Set Git global HTTP proxy
+  shell: 
+    cmd: git config --global http.proxy "{{ http_proxy_url }}"
+  args:
+    executable: /bin/bash
+
+- name: Set Git global HTTPS proxy
+  shell: 
+    cmd: git config --global https.proxy "{{ http_proxy_url }}"
+  args:
+    executable: /bin/bash
+
+- name: Clone or update repository
+  git:
+    repo: "{{ repo_url }}"
+    dest: "{{ dest_path }}"
+    version: "{{ repo_branch | default('master') }}"
+    update: yes
+    force: yes
+  register: git_result
+
+- name: Check for cloning errors
+  fail:
+    msg: "Failed to clone or update the repository."
+  when: 
+    - git_result is defined
+    - git_result.failed
+
+- name: Debugging repository cloning status
+  debug:
+    msg: "Repository at {{ dest_path }} has been updated or cloned."
+
+

@@ -1,0 +1,53 @@
+- name: Include OS-family-specific packages
+  include_vars:
+    file: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "vars/{{ ansible_os_family | lower }}-packages.yaml"
+      skip: true
+
+- name: Include distribution-specific packages
+  include_vars:
+    file: "{{ lookup('first_found', params) }}"
+  ignore_errors: true
+  vars:
+    params:
+      files:
+        - "vars/{{ ansible_distribution | lower }}-packages.yaml"
+      skip: true
+
+- name: Include specific distribution version packages
+  include_vars:
+    file: "{{ lookup('first_found', params) }}"
+  ignore_errors: true
+  vars:
+    params:
+      files:
+        - "vars/{{ ansible_distribution | lower }}{{ ansible_distribution_version | replace('.', '') | lower }}-packages.yaml"
+      skip: true
+
+# Now install the packages
+# Install OS family-specific packages
+- name: Install RedHat family packages
+  dnf:
+    name: "{{ family_packages }}"
+    state: present
+  become: true
+  when: family_packages is defined
+
+# Install distribution-specific packages
+- name: Install distribution-specific packages
+  dnf:
+    name: "{{ distribution_packages }}"
+    state: present
+  become: true
+  when: distribution_packages is defined
+
+# Install specific distribution version packages
+- name: Install specific distribution version packages
+  dnf:
+    name: "{{ specific_distribution_packages }}"
+    state: present
+  become: true
+  when: specific_distribution_packages is defined

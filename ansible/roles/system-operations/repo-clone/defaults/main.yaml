@@ -1,0 +1,17 @@
+---
+# Default variables for repo-clone role
+# Variables:
+#   repo_url: URL of the repository to clone (required)
+#   dest_path: Destination path on the local system where the repository will be cloned (required)
+#   repo_branch: The branch of the repository to check out. Defaults to 'master'.
+
+# URL of the Git repository to clone
+repo_url: ''
+
+# Local path where the repository will be cloned
+dest_path: ''
+
+# Branch of the repository to clone
+repo_branch: 'master'
+
+http_proxy_url: "http://192.168.75.1:3128"

@@ -1,0 +1,45 @@
+#!/bin/bash -e
+
+SDIR=`dirname $(readlink -f "$0")`
+WDIR="${SDIR}/work/capivme"
+ARCHIVE="DLIN-X86_64-V1UC"
+SCRIPT='/etc/init.d/DLIN-X86_64-VME'
+
+echo "I'm installing CAPI VME!"
+
+[ -d "$WDIR" ] && rm -rf "$WDIR"
+mkdir -p "$WDIR"
+cd $WDIR
+
+umount /mnt 2>&1 >/dev/null ||:
+mount ${SDIR}/${ARCHIVE}.iso /mnt
+cp /mnt/${ARCHIVE}.tar.gz .
+tar xvf ${ARCHIVE}.tar.gz 
+cd "${ARCHIVE}"
+
+# once in archive directory, install and start
+./uninstall 2>&1 >/dev/null ||:
+./install
+
+cat <<EOF | tee /etc/systemd/system/capivme.service 
+[Unit]
+Description=Abaco Linux CAPI VME Driver
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=${SCRIPT} start
+ExecStop=${SCRIPT} stop
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable capivme
+systemctl start capivme
+
+${SCRIPT} start
+
+echo "Done!"
+

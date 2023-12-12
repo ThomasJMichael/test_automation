@@ -3,12 +3,12 @@
   become: true
   become_method: sudo
   command:
-    cmd: "cobblerTool {{ current_os }} --repo_dir /vagrant_shared/config/systems --pconfig {{ pconfig }} --force --debug"
+    cmd: "cobblerTool {{ target_os }} --repo_dir /vagrant_shared/config/systems --pconfig {{ config_json }} --force --debug"
   register: cobbler_output
   delegate_to: localhost
 
 - debug:
-    msg: "Running cobblerToolWrapper.sh with parameters: {{ current_os }}, --repo_dir /vagrant_shared/config/systems, --pconfig {{ pconfig }}, --force, --debug"
+    msg: "Running cobblerToolWrapper.sh with parameters: {{ target_os }}, --repo_dir /vagrant_shared/config/systems, --pconfig {{ config_json }}, --force, --debug"
   when: debug_mode | default(false)
   delegate_to: localhost
 

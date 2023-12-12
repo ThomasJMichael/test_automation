@@ -1,0 +1,32 @@
+- name: Check if curl is installed
+  command: which curl
+  register: curl_check
+  failed_when: curl_check.rc != 0
+  changed_when: false
+  ignore_errors: true  # Ensure the playbook continues even if this task fails
+
+- name: Run curl command
+  command: curl --version
+  when: curl_check.rc == 0
+  register: test_result
+  changed_when: false
+  ignore_errors: true  # Continue on failure
+
+- name: Set test status to failed
+  set_fact:
+    test_status: "failed"
+  when: curl_check.rc != 0 or test_result.rc != 0
+  ignore_errors: true
+
+- name: Set test status to passed
+  set_fact:
+    test_status: "passed"
+  when: curl_check.rc == 0 and test_result.rc == 0
+  ignore_errors: true
+
+- name: Summarize test results
+  debug:
+    msg: "Test for curl: {{ test_status }}"
+  when: test_status is defined
+  tags:
+    - test_summary

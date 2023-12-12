@@ -1,4 +1,4 @@
-common_fedora_packages:
+distribution_packages:
   - libgpiod
   - libgpiod-utils
   - python3-docutils

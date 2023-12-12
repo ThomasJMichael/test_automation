@@ -1,0 +1,8 @@
+---
+- name: Set Host Date to Given Date
+  command: "date -s '{{ date }}'"
+  become: true
+
+- name: Synchronize Hardware Clock with System Clock
+  command: hwclock --systohc
+  become: true

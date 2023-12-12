@@ -1,0 +1,10 @@
+# defaults/main.yml in slave-board-setup role
+SYSTEM_NAME: "default_system_name"
+NETDEV: "eno01"
+MAC_ADDRESS: "00:00:00:00:00:00"
+IP_ADDRESS: "192.168.75.222"
+GATEWAY: "192.168.75.1"
+KOPTS: "console=ttyS0,115200,8,n,1"
+DEV_USERNAME: "npi"
+DEV_PASSWORD: "password"
+OS: "rocky92"

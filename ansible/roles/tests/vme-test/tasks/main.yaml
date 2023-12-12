@@ -1,0 +1,70 @@
+- name: Copy vme test files to target
+  become: true
+  copy:
+    src: vme/
+    dest: /opt/vme/
+    remote_src: false
+  delegate_to: localhost
+
+- name: Ensure install scripts are executable
+  file:
+    path: "/opt/vme/{{ script }}"
+    mode: '0755'
+  become: true
+  loop:
+    - install.sh
+    - prepare_driver.sh
+    - examples.py
+  loop_control:
+    loop_var: script
+
+- name: "Clone vme repo"
+  include_role:
+    name: system-operations/repo-clone
+  vars:
+    repo_url: "{{ repo_clone_vars.repo_url }}"
+    dest_path: "{{ repo_clone_vars.dest_path }}"
+    repo_branch: "{{ repo_clone_vars.repo_branch | default('master') }}"
+
+- name: Run install.sh script
+  shell: ./install.sh
+  become: true
+  args:
+    chdir: "/opt/vme/"
+
+- name: Run prepare_driver.sh script
+  shell: ./prepare_driver.sh
+  become: true
+  args:
+    chdir: "/opt/vme/"
+
+- name: Install python dependencies from requirments.txt
+  become: true
+  pip:
+    requirements: "/opt/vme/requirements.txt"
+  
+- name: Run examples.py script
+  become: true
+  shell: python3 examples.py --uat_ip {{ board_config.uat.ip_address }} --uat_user {{ board_config.uat.username }} --uat_pass {{ board_config.uat.password }}
+  register: test_results
+  args:
+    chdir: "/opt/vme/"
+
+- name: Set test status to failed
+  set_fact:
+    test_status: "failed"
+  when: test_result.rc != 0
+  ignore_errors: true
+
+- name: Set test status to passed
+  set_fact:
+    test_status: "passed"
+  when: test_result.rc == 0
+  ignore_errors: true
+
+- name: Summarize test results
+  debug:
+    msg: "Test for vme: {{ test_status }}"
+  when: test_status is defined
+  tags:
+    - test_summary

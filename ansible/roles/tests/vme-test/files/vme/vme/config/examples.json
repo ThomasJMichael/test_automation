@@ -1,0 +1,126 @@
+{
+    "gef_slot_id" : {
+        "cmd"           : "gef_slot_id",
+        "timeout"       : "10",
+        "exit_code"     : 0
+    },
+    "query_bus_pre" : {
+        "cmd"           : "gef_query_bus"    
+    },
+    "acquire_bus" : {
+        "cmd"           : "gef_acquire_bus",
+        "inputs"        : ["5"],
+        "timeout"       : "10",
+        "exit_code"     : 0
+    },
+    "query_bus_mid" : {
+        "cmd"           : "gef_query_bus"    
+    },
+    "release_bus" : {
+        "cmd"           : "gef_release_bus",
+        "timeout"       : "10",
+        "exit_code"     : 0
+    },
+    "query_bus_post" : {
+        "cmd"           : "gef_query_bus"    
+    },
+    "get_byteswap" : {
+        "cmd"           : "gef_get_hwbyteswap"   
+    },
+    "disable_byteswap" : {
+        "cmd"           : "gef_disable_hwbyteswap"   
+    },
+    "enable_byteswap" : {
+        "cmd"           : "gef_enable_hwbyteswap"   
+    },
+    "slave_window_a16" : {
+        "cmd"               : "gef_slave_window",
+        "inputs"            : ["0", "0", "0x1000", "1", "5", "1", "3"],
+        "timeout"           : "10",
+        "exit_code"         : 0,
+        "error_token"       : ["ERROR:"]
+    },
+    "int_any_vector" : {
+        "cmd"           : "gef_generate_int",
+        "inputs"        : ["7", "250", "10"],
+        "timeout"       : "15",
+        "exit_code"     : 0,
+        "uat" : {
+            "cmd"           : "gef_wait_int",
+            "params"        : "",
+            "inputs"        : ["0x30", "7", "0xffffffff"]
+        }
+        
+    },
+    "callback_test" : {
+        "cmd"           : "gef_generate_int",
+        "inputs"        : ["1", "1", "5"],
+        "uat" : {
+            "cmd"           : "gef_int_callback",
+            "inputs"        : ["1", "1"],
+            "timeout"       : "10",
+            "exit"          : [""]
+        }
+    },
+    "a24_master_slave" : {
+        "cmd"           : "gef_master_window",
+        "inputs"        : ["0", "0x200000", "0x40000", "2", "2", "3", "1", "2", 
+                           "1", "4", "2", "0", "3",
+                           "1", "8", "2", "0", "2",
+                           "7"],
+        "timeout"       : "60",
+        "exit_code"     : 0,
+        "uat" : {
+            "cmd"           : "gef_slave_window",
+            "inputs"        : ["0", "0x200000", "0x40000", "2", "6", "2", "2", "0x200"],
+            "exit"          : ["3"]
+        }
+    },
+    "a32_vme_probe" : {
+        "cmd"           : "gef_vme_probe 0x40000010 0x09 4 0 peek",
+        "inputs"        : [],
+        "timeout"       : "30",
+        "exit_code"     : 0,
+        "uat" : {
+            "cmd"           : "gef_slave_window",
+            "inputs"        : ["0", "0x40000000", "0x10000", "3", "1", "1", "2", "0x20"],
+            "exit"          : ["1", "0x20", "3"]
+        }
+    },
+    "2eSST_dma_write" : {
+        "cmd"           : "gef_dma_write",
+        "inputs"        : ["0x20000", "0", "0", "0x8000000", "3", "4", "2", "5", 
+                           "22", "4", "2", "2", "7"],
+        "timeout"       : "30",
+        "exit_code"     : 0,
+        "uat" : {
+            "cmd"           : "gef_slave_window",
+            "inputs"        : ["0", "0x8000000", "0x20000", "3", "6", "5", "3", "1", "0x20"],
+            "exit"          : ["1", "0x20", "3"]
+        }
+            
+    },
+    "location_monitor" : {
+        "cmd"           : "gef_master_window",
+        "inputs"        : ["0", "0", "0x20000", "3", "1", "3", "1", "8",
+                           "2", "0x20", "2", "0", "1", "7"],
+        "uat" : {
+            "cmd"           : "gef_location_monitor",
+            "inputs"        : ["0", "0", "3", "5", "1"],
+            "exit"          : ["y"]
+        }
+    },
+    "gef_vrai" : {
+        "cmd"           : "gef_vrai",
+        "exit_code"     : [0, 255]
+    },
+    "reg_dump_pre" : {
+        "cmd"           : "gef_reg_dump"  
+    },
+    "gef_ctl" : {
+        "cmd"           : "gef_ctl"    
+    },
+    "reg_dump_post" : {
+        "cmd"           : "gef_reg_dump"  
+    }
+}
