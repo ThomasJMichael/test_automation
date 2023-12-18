@@ -4,6 +4,15 @@
     file: "tests/{{ current_test }}/vars/main.yml"
   register: test_vars
 
+- name: Run Test Role on UAT if required for setting initial state
+  include_role:
+    name: tests/{{ current_test }}
+  when: current_os in test_vars.required_os and uat_required
+
+- name: Set run-test Fact for UUT
+  set_fact:
+      run_test: true
+
 - name: Include Test Role
   include_role:
     name: tests/{{ current_test }}

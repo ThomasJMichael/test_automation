@@ -13,6 +13,11 @@
     board_config: {}
 
   tasks:
+    - name: Set log path and log filename facts
+      set_fact:
+        log_path: "/vagrant_shared/logs/{{ board_name }}"
+        log_filename: "{{ board_name }}_{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}"
+
     - name: Load Board Configurations
       include_vars:
         file: "/vagrant_shared/ansible/config/{{ board_name }}.yaml"
@@ -59,6 +64,10 @@
         apply:
           delegate_to: "{{ board_config.uat.ip_address }}"
           when: uat_required
+
+    - name: Set run-test Fact for UUT
+      set_fact:
+        run_test: true
 
     - name: Run Specified Test Role
       include_role:

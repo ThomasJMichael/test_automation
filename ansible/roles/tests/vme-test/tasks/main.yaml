@@ -5,6 +5,8 @@
     dest: /opt/vme/
     remote_src: false
   delegate_to: localhost
+  register: copy_result
+  ignore_errors: true
 
 - name: Ensure install scripts are executable
   file:
@@ -17,6 +19,8 @@
     - examples.py
   loop_control:
     loop_var: script
+  register: chmod_result
+  ignore_errors: true
 
 - name: "Clone vme repo"
   include_role:
@@ -25,46 +29,66 @@
     repo_url: "{{ repo_clone_vars.repo_url }}"
     dest_path: "{{ repo_clone_vars.dest_path }}"
     repo_branch: "{{ repo_clone_vars.repo_branch | default('master') }}"
+  register: clone_result
+  ignore_errors: true
 
 - name: Run install.sh script
   shell: ./install.sh
   become: true
   args:
     chdir: "/opt/vme/"
+  register: install_result
+  ignore_errors: true
 
 - name: Run prepare_driver.sh script
   shell: ./prepare_driver.sh
   become: true
   args:
     chdir: "/opt/vme/"
+  register: prepare_driver_result
+  ignore_errors: true
 
 - name: Install python dependencies from requirments.txt
   become: true
   pip:
     requirements: "/opt/vme/requirements.txt"
+  register: pip_result
+  ignore_errors: true
   
 - name: Run examples.py script
   become: true
   shell: python3 examples.py --uat_ip {{ board_config.uat.ip_address }} --uat_user {{ board_config.uat.username }} --uat_pass {{ board_config.uat.password }}
-  register: test_results
   args:
     chdir: "/opt/vme/"
-
-- name: Set test status to failed
-  set_fact:
-    test_status: "failed"
-  when: test_result.rc != 0
+  when: run_tests | default(false)
+  register: examples_result
   ignore_errors: true
 
-- name: Set test status to passed
+- name: Create list of task results
   set_fact:
-    test_status: "passed"
-  when: test_result.rc == 0
-  ignore_errors: true
+    task_results: [
+      "{{ copy_result | default({'failed': false}) }}",
+      "{{ chmod_result | default({'failed': false}) }}",
+      "{{ clone_result | default({'failed': false}) }}",
+      "{{ install_result | default({'failed': false}) }}",
+      "{{ prepare_driver_result | default({'failed': false}) }}",
+      "{{ pip_result | default({'failed': false}) }}",
+      "{{ examples_result | default({'failed': false}) }}"
+    ]
+
+- name: Determine if any tasks failed
+  set_fact:
+    test_failed: "{{ test_failed | default(false) or (item.failed | default(false)) }}"
+  loop: "{{ task_results }}"
+
+
+- name: Set test status
+  set_fact:
+    test_status: "{{ 'failed' if test_failed else 'passed' }}"
 
 - name: Summarize test results
   debug:
     msg: "Test for vme: {{ test_status }}"
-  when: test_status is defined
+  when: run_tests | default(false)
   tags:
     - test_summary

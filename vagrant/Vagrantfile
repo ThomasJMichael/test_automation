@@ -25,6 +25,8 @@ Vagrant.configure("2") do |config|
 
   config.vm.provider "virtualbox" do |vb|
     vb.name = "test-automation vm"
+    vb.memory = "4096"
+    vb.cpus = 2
   end
 
   config.vm.provision "shell", path: "../scripts/vagrant/provision_vagrant_vm.sh"
