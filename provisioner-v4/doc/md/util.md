@@ -1,0 +1,300 @@
+# Class aslinuxtester.util.Util  
+- [Source for this class](../../aslinuxtester/util.py)
+- [Full Library Documentation](../../README.md)  
+- [Example Usage](examples.md)  
+
+Shared functions, paths, and parameters for use throughout the provisioner system.  
+  
+Include by doing  
+```python  
+from aslinuxtester.util import Util  
+util = Util('/path/to/config/repo')  
+...  
+```  
+  
+There are several filepaths which can be set explicitly by manipulating the  
+Util.local_filepaths and Util.remote_filepaths dictionaries.  
+  
+```python  
+# valid manually settable and their defaults are as follows  
+self.local_filepaths['sshconfig']           # <repodir>/config/ssh  
+self.local_filepaths['prereqscripts']       # <repodir>/scripts/prereqs  
+self.local_filepaths['postreqscripts']      # <repodir>/scripts/postreqs  
+self.local_filepaths['driverscripts']       # <repodir>/scripts/driver_installers  
+self.local_filepaths['logs']                # ./logs  
+  
+self.remote_filepaths['prereqscripts']      # ./.scripts/abacoprecfg  
+self.remote_filepaths['postreqscripts']     # ./.scripts/abacpostcfg  
+self.remote_filepaths['driverscripts']      # ./drivers  
+self.remote_filepaths['tests']              # ./tests  
+```  
+
+### **__init__**(self, **kwargs)  [[source](../../aslinuxtester/util.py#L66)]  
+    Calls Util.set_path with the supplied repo_dir. Prints a warning if repo_dir  
+    is left empty.  
+      
+    Keyword args:  
+      - repo_dir (str): [.] Path to the configuration repository  
+      - outfile (str): [None] Path to an output file that all prints will go to  
+      - logger (str): ['alt'] Name of a python logger to use  
+      - loglevel (logging.LEVEL): [logging.INFO] Loglevel to print at  
+
+### **get_logger**(self)  [[source](../../aslinuxtester/util.py#L102)]  
+    Returns the python logger in use by Util  
+
+### **print**(self, printstr, **kwargs)  [[source](../../aslinuxtester/util.py#L107)]  
+    Print helper that understands the 'quiet' option. Also prints to a file  
+    if one was configured at Util init.  
+      
+    Args:  
+      - printstr (str): The string to print  
+    Keyword args:  
+      - quiet (bool): [False] Don't print to stdout, still prints to outfile  
+      - outfile (file): [None] File to log shenanigans in  
+      - end (str): ['\n'] 'end' kwarg to pass to print function  
+      - use_logger (bool): [True] Use the logger instead of standard print  
+      - logger (str): [{modulename}.{fnname}] Logger child to use  
+      - level (logging.LEVEL): [logging.INFO] Log level to use  
+
+### **set_paths**(self, repo_dir)  [[source](../../aslinuxtester/util.py#L146)]  
+    Sets local and remote filepaths using the supplied repository path.  
+      
+    Args:  
+      - repo_dir (str): Path to the configuration repository  
+
+### **build_config**(self, tgt_os, **kwargs)  [[source](../../aslinuxtester/util.py#L175)]  
+    Builds a configuration from a given provisioner config file and a target OS.  
+      
+    Args:  
+      - tgt_os (str): The string name of an OS configured in both pconfig and oconfig.  
+    Keyword args:  
+      - uat_cfg (dict): [None] A dict containing the configuration dict for a UAT or a  
+        relative path from repo_dir to another config file. If None, tries to load UAT  
+        from 'uat' field on loaded pconfig  
+      - override_ip (str): [None] The current IP of the machine to connect to  
+      - pconfig (str|dict): ['provision.json'] The name of the provisioner file or a dict  
+      - oconfig (str): ['os.json'] The name of the OS file to be found in repo_dir  
+    Returns:  
+        A dict containing the formatted configuration for use by the provisioner  
+    Raises:  
+      - ValueError or Exception if invalid config is provided. See errstr for details  
+
+### **get_provision_config**(self, **kwargs)  [[source](../../aslinuxtester/util.py#L265)]  
+    Fetches the provisioner pseudo-template configuration from a given provisioner config file.  
+      
+    Keyword args:  
+      - pconfig (str|dict): ['provision.json'] The name of the provisioner file or a dict  
+      - mac (str): [None] MAC address to replace in pconfig file  
+    Returns:  
+        A dict containing the unformatted provisioner configuration.  
+
+### **update_dict**(self, dict1, dict2, **kwargs)  [[source](../../aslinuxtester/util.py#L296)]  
+    Combines two dicts recursively. Requires that each field in both dicts be of same type.  
+      
+    Args:  
+      - d1 (dict): First dict to combine  
+      - d2 (dict): Second dict to combine  
+    Keyword args:  
+      - pref_d2 (bool): [False] If True, use d2 values for non lists and dicts. Else use d1  
+    Returns:  
+        The combined dict  
+
+### **get_os_config**(self, **kwargs)  [[source](../../aslinuxtester/util.py#L326)]  
+    Builds the OS level config.  
+      
+    Keyword args:  
+      - tgt_os (str): [None] The string name of an OS configured in both pconfig and oconfig.  
+      - oconfig (str): ['os.json'] The name of the OS file to be found at repo_dir  
+      - os_list (list): [[]] Allowed OS's if defined in tgt cfg  
+    Returns:  
+        A dict containing either the requested OS configuration or the entire oconfig file  
+    Raises:  
+        A ValueError if invalid OS is supplied  
+
+### **check_target_config**(self, tgt_cfg, **kwargs)  [[source](../../aslinuxtester/util.py#L369)]  
+    Connects to the target machine and compares {Util.remote_filepaths['complete_flag']}  
+    to {tgt_cfg} file.  
+      
+    Args:  
+      - tgt_cfg (dict): The configuration to compare to the installed configuration.  
+    Keyword args:  
+      - quiet (bool): [False] Set to true to hide status messages  
+      - client (paramiko.SSHClient): [Util._client] paramiko.SSHClient object to use  
+    Returns:  
+        True if installed configuration matches the supplied one, else False  
+
+### **set_target_config**(self, tgt_cfg, **kwargs)  [[source](../../aslinuxtester/util.py#L409)]  
+    Connects to the target machine and sets {Util.remote_filepaths['complete_flag']} to  
+    {tgt_cfg} file.  
+      
+    Args:  
+      - tgt_cfg (dict): The configuration to compare to the installed configuration.  
+    Keyword args:  
+      - quiet (bool): [False] Set to true to hide status messages  
+      - client (paramiko.SSHClient): [Util._client] paramiko.SSHClient object to use  
+
+### **connect**(self, tgt_cfg, **kwargs)  [[source](../../aslinuxtester/util.py#L437)]  
+    Uses or sets up a client object for connecting to a target machine. Switches based  
+    on availability of SSH or WinRM on configured target machine.  
+      
+    Args:  
+      - tgt_cfg (dict): The configuration to use for the connection.  
+    Keyword args:  
+      - quiet (bool): [False] Set to true to hide status messages  
+      - attempts (int): [50] How many times to try the connection before admitting defeat  
+      - delay (int): [10] How long in seconds to wait between attempts  
+      - client (paramiko.SSHClient|winrm.Session): [None] A client session object to use  
+    Returns:  
+      - The connected paramiko.SSHClient or winrm.Session object  
+    Raises:  
+      - ValueError if conn_type is invalid  
+      - An appropriate error if unable to connect  
+
+### **_winrm_connect**(self, tgt_cfg, **opts)  [[source](../../aslinuxtester/util.py#L475)]  
+    Uses or sets up a winrm.Session object to connect to a target machine and sets  
+    {Util._client} to the object. Should only be called through Util.connect  
+
+### **_ssh_connect**(self, tgt_cfg, **opts)  [[source](../../aslinuxtester/util.py#L496)]  
+    Uses or sets up a paramiko.SSHClient object to connect to a target machine and sets  
+    {Util._client} to the object. Should only be called through Util.connect  
+
+### **reboot**(self, tgt_cfg, **kwargs)  [[source](../../aslinuxtester/util.py#L543)]  
+    If an iboot is connected and iboot=False is not set, hard reboot the target.  
+    Otherwise issue a sudo reboot  
+      
+    Args:  
+      - tgt_cfg (dict): The configuration to use for the connection.  
+    Keyword args:  
+      - iboot (bool): [True] If True, reboot using the iboot's on/off functions  
+      - no_wait (bool): [False] If true, do not reconnect after sending reboot signal  
+      - connectargs (dict): [{}] kwargs to pass to connect  
+    Returns:  
+      Nothing. Check it yourself.  
+
+### **run_command**(self, cmdstr, **kwargs)  [[source](../../aslinuxtester/util.py#L582)]  
+    Connects to the target machine using an appropriate method and runs a supplied  
+    command there.  
+      
+    Args:  
+      - cmdstr (str): The command to run on the machine connected to the client  
+    Global Keyword args:  
+      - strict (bool): [False] If True, raise an exception  if command exits with non-zero code  
+      - quiet (bool): [False] Set to true to hide status messages  
+      - client (paramiko.SSHClient|winrm.Session): [Util._client] session object to use  
+      - file (file): [None] if supplied, copy stdout and stderr from command into the file  
+      - logger (str): [{modulename}.{fnname}.run_command] Logger child string  
+      - local (bool): [False] Run command from the test host, not from UUT or UAT  
+    Linux Keyword args:  
+      - sshopts (dict): [{}] kwargs to be supplied to paramiko.SSHClient.exec_command  
+      - shell (bool): [False] opens a limited interactive shell. Useful only for debugging  
+      - stdout (bool): [False] if true, return stdout instead of exit code  
+    Windows Keyword args:  
+      - use_ps (bool): [True] Use powershell to run commands instead of cmd  
+    Returns:  
+        The exit code of the command  
+    Raises:  
+      - Global:  
+        - RuntimeError if client has not been initialized  
+      - Linux:  
+        - paramiko.ssh_exception.SSHException if strict is True and the command fails  
+      - Windows:  
+        -  
+
+### **run_local**(self, cmdstr, **kwargs)  [[source](../../aslinuxtester/util.py#L637)]  
+    Calls self.local_command with the local=True flag set.  
+      
+    Takes all the same Keyword Args.  
+
+### **_winrm_command**(self, cmdstr, **opts)  [[source](../../aslinuxtester/util.py#L647)]  
+    Uses an initialized winrm.Session object (can be generated by running  
+    `Util.connect`) to run a command via winrm. Do not invoke directly, instead use  
+    Util.run_command  
+
+### **_ssh_command**(self, _cmdstr, **opts)  [[source](../../aslinuxtester/util.py#L670)]  
+    Uses an initialized paramiko.SSHClient object (can be generated by running  
+    `Util.connect`) to run a command via SSH. Do not invoke directly, instead use  
+    Util.run_command  
+
+### **copy_file**(self, loc, rem, **kwargs)  [[source](../../aslinuxtester/util.py#L732)]  
+    Connects to the target machine using a paramiko.sftp_client object and copies a file there.  
+      
+    Args:  
+      - loc (str): Path to the local file or dir  
+      - rem (str): Path to copy the local file or dir into  
+    Keyword args:  
+      - perm (oct): [None] The permissions to set for the copied file  
+      - ftp_client (paramiko.sftp_client): [None] paramiko.SFTP_Client to use  
+      - quiet (bool): [False] Suppress any prints  
+    Returns:  
+        The number of files copied.  
+
+### **get_file**(self, rem, loc, **kwargs)  [[source](../../aslinuxtester/util.py#L799)]  
+    Connects to the target machine using a paramiko.sftp_client object and retrieves a  
+    file there.  
+      
+    Args:  
+      - rem (str): Path to the remote file or dir to copy over  
+      - loc (str): Path to the local file or dir to copy into  
+    Keyword args:  
+      - perm (oct): [None] The permissions to set for the copied file  
+      - ftp_client (paramiko.sftp_client): [None] paramiko.SFTP_Client to use  
+      - quiet (bool): [False] Suppress any prints  
+    Returns:  
+        The number of files retrieved.  
+
+### **initialize_iboot**(self, tgt_cfg, **kwargs)  [[source](../../aslinuxtester/util.py#L858)]  
+    Attempts to initialize Util.iboot using the provided config dict.  
+      
+    Args:  
+      - tgt_cfg (dict): The configuration to use for the connection.  
+    Keyword args  
+      - iboot_cfg (dict): [None] If provided, overrides the configuration from tgt_cfg  
+      - debug (bool): [False]  
+    Returns  
+      False if iboot not configured, True otherwise  
+
+# Class aslinuxtester.util.IBoot  
+- [Source for this class](../../aslinuxtester/util.py)
+- [Full Library Documentation](../../README.md)  
+- [Example Usage](examples.md)  
+
+A simple iBoot control module. Member functions use the built-in HTTP API to control  
+a configured iBoot module. Should work fine with any iBoot model.  
+  
+iBoot config dict is as follows:  
+{  
+    'ip_address'    : '...',  
+    'user'          : '...',  
+    'password'      : '...'  
+}  
+
+### **IB_API**(self, **opts)  [[source](../../aslinuxtester/util.py#L927)]  
+
+### **__init__**(self, iboot_cfg, **kwargs)  [[source](../../aslinuxtester/util.py#L932)]  
+    Loads configuration of a specified iBoot device, identifies its current status,  
+    and sets the initial status bit.  
+      
+    Args:  
+      - iboot_cfg (dict): A dict containing an ip_address, user, and password  
+    Keyword args:  
+      - loglevel (logging.LEVEL): [logging.WARNING] loglevel for urllib3  
+      - debug (bool): [False] If true, print all output. Otherwise, hide all output.  
+
+### **print**(self, msg)  [[source](../../aslinuxtester/util.py#L955)]  
+
+### **get_status**(self)  [[source](../../aslinuxtester/util.py#L961)]  
+    Uses the IBoot web API to return the status bit of the iboot device.  
+
+### **on**(self)  [[source](../../aslinuxtester/util.py#L967)]  
+    Turns the iboot on via the web API  
+
+### **off**(self)  [[source](../../aslinuxtester/util.py#L974)]  
+    Turns the iboot off via the web api  
+
+### **toggle**(self, **kwargs)  [[source](../../aslinuxtester/util.py#L983)]  
+    Toggles the state of the iboot from off->on->off or on->off->on depending  
+    on the current status.  
+      
+    Keyword args:  
+      - duration (int): [5] How long to wait between the toggled states  
+

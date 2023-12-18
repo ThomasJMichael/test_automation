@@ -1,0 +1,4 @@
+@Library('abaco-pipelines') _
+pythonPipeline(
+    releaseMaster: true
+)

@@ -1,0 +1,114 @@
+Python Library Documentation: class Cobbler in module aslinuxtester.cobbler
+
+class Cobbler(builtins.object)
+ |  Cobbler(**kwargs)
+ |  
+ |  Controls cobbler operations on the test master, including:
+ |  - Distro imports
+ |  - Profile naming
+ |  - System creation
+ |  
+ |  Include by doing
+ |  ```python
+ |  from aslinuxtester.cobbler import Cobbler
+ |  from aslinuxtester.util import Util
+ |  util = Util('/path/to/config/repo')
+ |  cblr = Cobbler(util=util)
+ |  ...
+ |  ```
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, **kwargs)
+ |      If util is supplied at init, set the class-level util to that object.
+ |      Otherwise, requires a repo_dir to initialize a new util.Util
+ |      
+ |      Keyword args:
+ |        - util (util.Util): [None] A previously initialized util.Util object
+ |        - repo_dir (str): [None] The path to the configuration repository
+ |        - quiet (bool): [False] Shut it up you
+ |      Raises:
+ |        - ValueError if neither repo_dir nor util are provided
+ |  
+ |  add_system_ported_from_script(self, env, **kwargs)
+ |      This was originally a shell script that was called from a Jenkins server
+ |      running on the cobbler host. Manipulated the cobbler server directly
+ |      via subprocess and sets up the new cobbler system.
+ |      
+ |      Args:
+ |        - env (dict): All the required environment variables needed to tickle cobbler
+ |           + SYSTEM_NAME     : Name for the system in cobbler
+ |           + PROFILE         : Profile to attach to the new system
+ |           + MAC_ADDRESS     : MAC of the interface that will be PXE booting
+ |           + IP_ADDRESS      : Static IP to assign to the system
+ |           + GATEWAY         : The IP of the cobbler server visible to the system
+ |           + DEV_USERNAME    : User to create on the system
+ |           + DEV_PASSWORD    : Password for $DEV_USERNAME
+ |           + KOPTS           : Kernel options to pass to cobbler.
+ |           + KOPTS_POST      : Kernel options to pass to cobbler.
+ |           + KSMETASTRING    : Additional kickstart variables to supply to cobbler
+ |      Keyword args:
+ |        - quiet (bool): [False] Suppress status messages
+ |      Returns
+ |          0 if successful, else non-zero
+ |  
+ |  create_profile_if_missing(self, tgt_cfg, **kwargs)
+ |      Checks the local cobbler server for the OS specified in config, and attempts to
+ |      import the OS if possible.
+ |      
+ |      Args:
+ |        - osconfig (dict): Just the 'os' config field from util.Util.build_config
+ |      Keyword args:
+ |        - quiet (bool): [False] Suppress status messages
+ |        - sigs (bool): [False] Skip cobbler signature update
+ |      Raises:
+ |        - IOError if supplied with an invalid filepath for an ISO to import
+ |      Returns:
+ |          True if successful, else False
+ |  
+ |  provision_system(self, config, **kwargs)
+ |      Checks the local cobbler server for the OS specified in config, and attempts to
+ |      import the OS if possible. If that is successful, creates a cobbler system and
+ |      sets it to boot the selected OS on reboot.
+ |      
+ |      Args:
+ |        - config (dict): A formatted configuration dict from util.Util.build_config
+ |      Keyword args:
+ |        - force (bool): [False] Ignore already installed configuration and force creation
+ |        - reload (bool): [False] Reload OS and configuration from os.json
+ |        - quiet (bool): [False] Suppress status messages
+ |        - sigs (bool): [False] Force a signature update if installing new distros
+ |      Raises:
+ |        - SystemError if cobbler failed to import the requested OS or the system could
+ |          not be added
+ |        - TypeError if an invalid OS configuration is provided
+ |      Returns:
+ |          True if reboot is needed to finish provisioning, False if not
+ |  
+ |  remove_profile(self, osconfig, **kwargs)
+ |      Args:
+ |        - osconfig (dict): Just the 'os' config field from util.Util.build_config
+ |      Keyword args:
+ |        - quiet (bool): [False] Suppress status messages
+ |      Raises:
+ |      Returns:
+ |          True if successful, else False
+ |  
+ |  remove_system(self, system_name, **kwargs)
+ |      This was originally a shell script that was called from a Jenkins server
+ |      running on the cobbler host. Manipulated the cobbler server directly
+ |      via subprocess and sets up the new cobbler system.
+ |      
+ |      Args:
+ |        - system_name (str): Name for the system in cobbler
+ |      Keyword args:
+ |        - quiet (bool): [False] Suppress status messages
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors defined here:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)

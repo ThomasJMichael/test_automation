@@ -1,0 +1,70 @@
+# Class aslinuxtester.nfs.NFS  
+- [Source for this class](../../aslinuxtester/nfs.py)
+- [Full Library Documentation](../../README.md)  
+- [Example Usage](examples.md)  
+
+Controls NFS boot setup as well as DHCP setup on the cobbler host  
+If cobbler is not present, attempts to use standard DHCP filepaths  
+  
+Include by doing  
+```python  
+from aslinuxtester.nfs import NFS  
+from aslinuxtester.util import Util  
+util = Util('/path/to/config/repo')  
+nfs = NFS(util=util)  
+...  
+```  
+
+### **__init__**(self, **kwargs)  [[source](../../aslinuxtester/nfs.py#L30)]  
+    If util is supplied at init, set the class-level util to that object.  
+    Otherwise, requires a repo_dir to initialize a new util.Util  
+      
+    Keyword args:  
+      - util (util.Util): [None] A previously initialized util.Util object  
+      - repo_dir (str): [None] The path to the configuration repository  
+      - quiet (bool): [False] Shut it up you  
+    Raises:  
+      - ValueError if neither repo_dir nor util are provided  
+
+### **provision_system**(self, config, **kwargs)  [[source](../../aslinuxtester/nfs.py#L58)]  
+    Checks the local cobbler server for the OS specified in config, and attempts to  
+    import the OS if possible. If that is successful, creates a cobbler system and  
+    sets it to boot the selected OS on reboot.  
+      
+    Args:  
+      - config (dict): A formatted configuration dict from util.Util.build_config  
+    Keyword args:  
+      - force (bool): [False] Ignore already installed configuration and force creation  
+      - reload (bool): [False] Reload OS and configuration from os.json  
+      - quiet (bool): [False] Suppress status messages  
+      - sigs (bool): [False] Force a signature update if installing new distros  
+    Raises:  
+      - SystemError if cobbler failed to import the requested OS or the system could  
+        not be added  
+      - TypeError if an invalid OS configuration is provided  
+    Returns:  
+        True if reboot is needed to finish provisioning, False if not  
+
+### **remove_profile**(self, osconfig, **kwargs)  [[source](../../aslinuxtester/nfs.py#L218)]  
+    Args:  
+      - osconfig (dict): Just the 'os' config field from util.Util.build_config  
+    Keyword args:  
+      - quiet (bool): [False] Suppress status messages  
+    Raises:  
+    Returns:  
+        True if successful, else False  
+
+### **create_profile_if_missing**(self, tgt_cfg, **kwargs)  [[source](../../aslinuxtester/nfs.py#L257)]  
+    Checks the local cobbler server for the OS specified in config, and attempts to  
+    import the OS if possible.  
+      
+    Args:  
+      - osconfig (dict): Just the 'os' config field from util.Util.build_config  
+    Keyword args:  
+      - quiet (bool): [False] Suppress status messages  
+      - sigs (bool): [False] Skip cobbler signature update  
+    Raises:  
+      - IOError if supplied with an invalid filepath for an ISO to import  
+    Returns:  
+        True if successful, else False  
+

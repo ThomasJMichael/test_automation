@@ -1,0 +1,10 @@
+loadfont unicode
+set timeout=5
+set menu_color_normal=white/black
+set menu_color_highlight=black/light-gray
+
+menuentry "DISTRO" {
+        set gfxpayload=keep
+        linux   /boot/DISTRO/vmlinuz ip=dhcp cloud-config-url=/dev/null url=http://SERVER/DISTRO.iso autoinstall ds="nocloud-net;s=http://SERVER/DISTRO/" console=ttyS0,115200
+        initrd  /boot/DISTRO/initrd
+}

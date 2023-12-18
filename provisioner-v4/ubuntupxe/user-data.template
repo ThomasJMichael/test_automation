@@ -1,0 +1,24 @@
+#cloud-config
+autoinstall:
+  network:
+    version: 2
+    ethernets:
+      ETHNAME:
+        addresses:
+          - ETHADDR/NETMASK
+  proxy: http://PROXY:3128/
+  identity:
+    hostname: HOSTNAME
+    password: $6$UUtFNi6J$lrKFnfQ1IN6I1/6Biw88EV1MOqSgTrmTah7N8YTXks0dxqosni.DxmrhikTpazk.sF9xFmNNAou4rZcsCUTWH/
+    username: USER
+  ssh:
+    install-server: yes
+  storage:
+    layout:
+      name: lvm
+      match:
+        path: /dev/INSTALLDEV
+  late-commands:
+  - 'echo "USER ALL=(ALL) NOPASSWD:ALL" > /target/etc/sudoers.d/ubuntu-nopw'
+  - shutdown -h now
+  version: 1

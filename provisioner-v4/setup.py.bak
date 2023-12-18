@@ -1,0 +1,141 @@
+#!/usr/bin/env python3
+import os
+import sys
+import inspect
+import pydoc
+import importlib
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
+
+if len(sys.argv) > 1 and sys.argv[1] == 'doc':
+    from aslinuxtester import util, cobbler, nfs, dependencies, test, validator
+
+    docdir = 'doc'
+    docloc = {
+        'html'  : f'{docdir}/html',
+        'md'    : f'{docdir}/md',
+        'txt'   : f'{docdir}/txt'
+    }
+    doc_candidates = {
+        'util'          : [util.Util, util.IBoot],
+        'cobbler'       : [cobbler.Cobbler],
+        'nfs'           : [nfs.NFS],
+        'dependencies'  : [dependencies.Dependencies],
+        'test'          : [test.Test],
+        'validator'     : [validator.Validator],
+    }
+    exmpdir = 'examples'
+    docdepth = "".join([ "../" for k in docloc["md"].split("/") ])
+
+    for d in docloc:
+        if not os.path.isdir(docloc[d]):
+            os.makedirs(docloc[d])
+    def doc_main():
+        for cand in doc_candidates:
+            print(f'Processing {cand}')
+            with open(f'{docloc["md"]}/{cand}.md', 'w') as md_f, \
+                    open(f'{docloc["html"]}/{cand}.html', 'w') as html_f, \
+                    open(f'{docloc["txt"]}/{cand}.txt', 'w') as txt_f:
+                for classobj in doc_candidates[cand]:
+                    txt_f.write(pydoc.render_doc(classobj, renderer=pydoc.plaintext))
+                    html_f.write(pydoc.HTMLDoc().docmodule(classobj))
+                    doc_md(classobj, md_f)
+        with open(f'{docdir}/md/examples.md', 'w') as exampledoc:
+            print('# Example usages  ', file=exampledoc)
+            sys.path.insert(0, exmpdir)
+            for examplefile in os.listdir(exmpdir):
+                if os.path.isfile(f'{exmpdir}/{examplefile}'):
+                    print(f'Building example doc for {examplefile}')
+                    doc_examples(examplefile, exampledoc)
+
+    def doc_md(classobj, output=sys.stdout):
+        class_name = f"{classobj.__dict__['__module__']}.{classobj.__name__}"
+        srcfile = inspect.getfile(classobj).split('/')[-1]
+        with open(inspect.getfile(classobj)) as f:
+            srclines = f.read().splitlines()
+
+        print(f'# Class {class_name}  ', file=output)
+        print(f'- [Source for this class]({docdepth}aslinuxtester/{srcfile})', file=output)
+        print(f'- [Full Library Documentation]({docdepth}README.md)  ', file=output)
+        print(f'- [Example Usage](examples.md)  ', file=output)
+        print('', file=output)
+
+        if inspect.getdoc(classobj):
+            for line in inspect.getdoc(classobj).split('\n'):
+                print(f'{line}  ', file=output)
+
+        for entry in classobj.__dict__:
+            if inspect.isfunction(classobj.__dict__[entry]):
+                fn = classobj.__dict__[entry]
+                firstline = inspect.getsourcelines(fn)[0][0]
+                lineno = srclines.index(firstline.replace('\n','')) + 1
+                print(file=output)
+                print((f'### **{entry}**{inspect.signature(fn)}  '
+                       f'[[source]({docdepth}aslinuxtester/{srcfile}#L{lineno})]  '),
+                       file=output)
+                if inspect.getdoc(fn):
+                    for line in inspect.getdoc(fn).split('\n'):
+                        print(f'    {line}  ', file=output)
+        print('', file=output)
+
+    def doc_examples(filename, output=sys.stdout):
+        mod = importlib.import_module(f'{filename.replace(".py","")}')
+
+        # print docstring as header and description
+        print((
+            f'## [{filename}]({docdepth}'
+            f'{exmpdir}/{filename})  '
+            ), file=output)
+        print('', file=output)
+        print(inspect.getdoc(mod), file=output)
+        print('', file=output)
+        print('```python', file=output)
+        # print code to file
+        skip = False
+        for line in inspect.getsourcelines(mod)[0]:
+            dehydrated = " ".join(line.split())
+            if dehydrated == '"""':
+                # toggle skip bit
+                skip = not skip
+            elif dehydrated.startswith('"""') and dehydrated.endswith('"""'):
+                # one line docstring, skip
+                pass
+            elif not skip:
+                print(line, file=output, end='')
+        print('```', file=output)
+        print('', file=output)
+
+    doc_main()
+    exit()
+
+dir_path = os.path.dirname(os.path.abspath(__file__))
+version = open(os.path.join(dir_path, "VERSION")).read().strip()
+
+def parse_requirements(reqfile):
+    r = []
+    with open(reqfile, 'r') as f:
+        r = f.read().splitlines()
+    return r
+
+setup(
+    name='aslinuxtester',
+    version=version,
+    author='Denver Atwood',
+    author_email='denver.atwood@abaco.com',
+    packages=['aslinuxtester',],
+    license='GPLv2',
+    description='Controls cobbler and other provisioning tools for Linux testing',
+    long_description=open('README.md').read(),
+    install_requires=parse_requirements('requirements.txt'),
+    tests_require=parse_requirements('requirements.txt'),
+    entry_points={
+        'console_scripts': [
+            'cobblerTool = aslinuxtester.cobbler:main',
+            'NFSTool = aslinuxtester.nfs:main',
+            'dependenciesTool = aslinuxtester.dependencies:main',
+            'testTool = aslinuxtester.test:main',
+        ]
+    },
+)

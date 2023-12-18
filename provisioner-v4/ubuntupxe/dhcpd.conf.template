@@ -1,0 +1,11 @@
+default-lease-time 600;
+max-lease-time 7200;
+allow booting;
+allow bootp;
+
+subnet SUBNET netmask NETMASK {
+  range RANGE;
+  option routers SERVER;
+  filename "boot/bootx64.efi";
+}
+

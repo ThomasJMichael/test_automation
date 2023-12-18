@@ -1,0 +1,10 @@
+loadfont unicode
+set timeout=5
+set menu_color_normal=white/black
+set menu_color_highlight=black/light-gray
+
+menuentry UAT {
+        set gfxpayload=keep
+        linux   /boot/VMLINUZ ip=IPADDR::GATEWAY:255.255.255.0::NETDEV:off console=ttyS0,115200
+        initrd  /boot/INITRD
+}
